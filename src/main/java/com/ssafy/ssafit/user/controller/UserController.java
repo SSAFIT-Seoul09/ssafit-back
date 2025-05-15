@@ -35,6 +35,5 @@ public class UserController {
         log.info("로그인 요청: {}", requestDto.getEmail());
         UserSignInResponseDto responseDto = userService.login(requestDto, res);
         return ResponseEntity.ok(ApiResponse.success("로그인에 성공하였습니다.", responseDto));
-
     }
 }
