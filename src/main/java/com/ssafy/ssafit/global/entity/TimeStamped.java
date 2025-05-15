@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 
 @Getter
 public abstract class TimeStamped {
+
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 }

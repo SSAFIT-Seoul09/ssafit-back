@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class UserSignUpRequestDto {
+
     private String nickname;
     private int age;
     private String email;

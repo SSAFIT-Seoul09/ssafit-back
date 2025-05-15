@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 public class UserSignUpResponseDto {
+
     private Long userId;
     private String nickName;
     private String email;
@@ -25,6 +26,5 @@ public class UserSignUpResponseDto {
                 .age(user.getAge())
                 .createdAt(user.getCreatedAt())
                 .build();
-
     }
 }
