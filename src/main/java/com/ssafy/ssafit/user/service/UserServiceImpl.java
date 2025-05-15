@@ -12,7 +12,6 @@ import com.ssafy.ssafit.user.exception.InvalidUserCredentialException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
+    // 로그인
     @Override
     public UserSignUpResponseDto signup(UserSignUpRequestDto requestDto) {
         validateEmailDuplication(requestDto.getEmail());
@@ -41,12 +41,13 @@ public class UserServiceImpl implements UserService {
         return UserSignUpResponseDto.toDto(insertedUser);
     }
 
+    // 회원가입
     @Override
     public UserSignInResponseDto login(UserSignInRequestDto requestDto, HttpServletResponse response) {
         User user = getUserByEmail(requestDto.getEmail());
         validatePassword(requestDto.getPassword(), user.getPassword());
 
-        String token = jwtUtil.createToken(user.getNickname(), user.getRole());
+        String token = jwtUtil.createToken(user.getId(), user.getRole());
         jwtUtil.addJwtToCookie(token, response);
 
         return UserSignInResponseDto.toDto(user, token);
@@ -68,6 +69,4 @@ public class UserServiceImpl implements UserService {
             throw EmailAlreadyExistException.of(email);
         }
     }
-
-
 }

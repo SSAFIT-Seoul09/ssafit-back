@@ -7,6 +7,7 @@ import com.ssafy.ssafit.user.dto.UserSignUpResponseDto;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface UserService {
+
     UserSignUpResponseDto signup(UserSignUpRequestDto requestDto);
 
     UserSignInResponseDto login(UserSignInRequestDto requestDto, HttpServletResponse res);
