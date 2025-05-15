@@ -1,20 +1,3 @@
----
-name: Issue Template
-about: Issue Template
-title: ''
-labels: ''
-assignees: ''
-
----
-
----
-name: Feature
-about: 어떤 기능을 추가하시나요?
-title: "FE: [feat] 대시보드 화면 구축"
-labels: ""
-assignees: ""
----
-
 ### 어떤 기능인가요?
 
 > 추가하려는 이슈에 대해 간결하게 설명해주세요
