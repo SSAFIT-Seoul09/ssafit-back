@@ -1,6 +1,7 @@
 package com.ssafy.ssafit.user.domain.model;
 
 public enum UserRole {
+
     ADMIN("ADMIN"),
     USER("USER");
 
