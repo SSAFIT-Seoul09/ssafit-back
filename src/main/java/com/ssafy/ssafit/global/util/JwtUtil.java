@@ -48,12 +48,12 @@ public class JwtUtil {
     }
 
     // JWT 생성(토큰 생성)
-    public String createToken(String nickname, UserRole role) {
+    public String createToken(Long userId, UserRole role) {
         Date date = new Date();
 
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(nickname) // 사용자 식별자값(ID)
+                        .setSubject(Long.toString(userId)) // 사용자 식별자값(ID). userId를 string으로 변환해서 넣어줌.
                         .claim(AUTHORIZATION_KEY, role) // 사용자 권한. claim이라 하고, key value를 넣어준다.
                         .setExpiration(new Date(date.getTime() + TOKEN_TIME)) // 만료 시간 (현재시간으로부터 60분 지속되게 하기 위함)
                         .setIssuedAt(date) // 발급일
