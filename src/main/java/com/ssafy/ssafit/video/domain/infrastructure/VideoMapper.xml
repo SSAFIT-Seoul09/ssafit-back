@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.ssafit.video.domain.repository.VideoDao">
+
+    <!--  영상 등록  -->
+    <insert id="insertVideo" parameterType="com.ssafy.ssafit.video.domain.model.Video" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO video (user_id, title, description, part, url, created_at, modified_at)
+        VALUES (#{userId}, #{title}, #{description}, #{part}, #{url}, NOW(), NOW());
+    </insert>
+
+    <!--  id로 영상 조회  -->
+    <select id="findById" resultType="com.ssafy.ssafit.video.domain.model.Video">
+        SELECT * FROM video WHERE id = #{id}
+    </select>
+
+
+</mapper>
