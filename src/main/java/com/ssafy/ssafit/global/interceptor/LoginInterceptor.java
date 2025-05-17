@@ -37,6 +37,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 1. 쿠키에서 토큰 까보기
         String tokenValue = jwtUtil.getTokenFromRequest(request);
         if (tokenValue == null) {
+            log.info("토큰이 존재하지 않습니다.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -47,6 +48,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 3. 토큰 유효성 검사
         if (!jwtUtil.validateToken(token)) {
+            log.info("토큰에 문제가 있습니다.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
