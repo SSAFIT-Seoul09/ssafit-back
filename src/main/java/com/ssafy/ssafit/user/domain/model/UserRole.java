@@ -1,5 +1,8 @@
 package com.ssafy.ssafit.user.domain.model;
 
+import lombok.Getter;
+
+@Getter
 public enum UserRole {
 
     ADMIN("ADMIN"),
