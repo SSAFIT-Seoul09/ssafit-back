@@ -34,11 +34,10 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
                                   WebDataBinderFactory binderFactory) throws Exception {
 
         // 현재 저장된 유저의 정보를 가져온다.
-        AuthenticatedUser user = UserContext.getUser();
-        if (user == null) {
+        AuthenticatedUser authenticatedUser = UserContext.getUser();
+        if (authenticatedUser == null)
             throw new RuntimeException("인증된 사용자가 없습니다.");
-        }
-        return user;
+        return authenticatedUser;
     }
 }
 

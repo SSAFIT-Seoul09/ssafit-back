@@ -1,6 +1,5 @@
 package com.ssafy.ssafit.global.interceptor;
 
-
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.UserContext;
 import com.ssafy.ssafit.global.util.JwtUtil;
@@ -34,22 +33,35 @@ public class LoginInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        log.info("요청시 토큰 검증 시작 : {}", jwtUtil.getTokenFromRequest(request));
         // 1. 쿠키에서 토큰 까보기
         String tokenValue = jwtUtil.getTokenFromRequest(request);
         if (tokenValue == null) {
+            log.info("토큰이 존재하지 않습니다.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
+
+        log.info("토큰 추출: {}", tokenValue); // 추가된 로그
 
         // 2. Bearer 제거
         String token;
         token = jwtUtil.substringToken(tokenValue);
 
-        // 3. 토큰 유효성 검사
-        if (!jwtUtil.validateToken(token)) {
+        // 3-1. 로그아웃 처리 된 토큰인지 확인
+        if (jwtUtil.isTokenBlacklisted(token)) {
+            log.info("로그아웃된 토큰입니다.");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
+
+        // 3-2. 토큰 유효성 검사
+        if (!jwtUtil.validateToken(token)) {
+            log.info("토큰에 문제가 있습니다.");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return false;
+        }
+
 
         // 4. 사용자 정보 추출
         Claims claims = jwtUtil.getUserInfoFromToken(token);
@@ -60,6 +72,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 6. ThreadLocal에 저장
         UserContext.setUser(authenticatedUser);
 
+        log.info("토큰 검증 완료 : {}", authenticatedUser.getUserId());
         return true;
     }
 

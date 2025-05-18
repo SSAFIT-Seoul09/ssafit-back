@@ -1,6 +1,8 @@
 package com.ssafy.ssafit.global.util;
 
+import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.user.domain.model.UserRole;
+import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -20,10 +22,16 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j // Logger를 가져오는 어노테이션
 @Component
 public class JwtUtil {
+
+    // 토큰 블랙리스트 메모리. Redis설정을 해주면 그때 바꾸자.
+    private final Set<String> blacklistedTokens = new HashSet<>(); // 블랙리스트 저장 (임시로 메모리 사용)
+
     // Header KEY 값. 지금은 쿠키의 네임값
     public static final String AUTHORIZATION_HEADER = "Authorization";
     // 사용자 권한 값의 KEY. role에 대한 값
@@ -76,6 +84,7 @@ public class JwtUtil {
 
     // Cookie에 들어있던 JWT 토큰을 Substring(토큰 앞에 Bearer와 공백을 붙여주기 때문에 토큰을 가져올때에는 substring을 해서 앞에 부분을 제거해서 사용해야한다.
     public String substringToken(String tokenValue) {
+        log.info("Beforesubstr token : {}", tokenValue);
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7); // Bearer + " " 총 7개.
         }
@@ -86,28 +95,44 @@ public class JwtUtil {
     // JWT 검증(토큰 검증)
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token); // 여기서 검증을 한다. parseClaimsJws에 토큰을 넣어주면 토큰의 위변조, 만료 등의 검증을 할 수 있다.
-            return true;
-        } catch (SecurityException | MalformedJwtException | SignatureException e) {  // 변조된 토큰 잡아내기
-            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
-        } catch (ExpiredJwtException e) {    // 만료된 토큰 잡아내기
-            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+
+            // JWT 토큰 검증
+            Jwts.parserBuilder()
+                    .setSigningKey(key)  // 서명 키 설정
+                    .build()
+                    .parseClaimsJws(token);  // 토큰 파싱 및 검증
+
+            return true;  // 검증 성공
+        } catch (SecurityException | MalformedJwtException | SignatureException e) {
+            // 서명 문제 또는 변조된 토큰
+            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰
+            logger.error("Expired JWT token, 만료된 JWT token 입니다.", e);
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
+            // 지원되지 않는 토큰
+            logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
         } catch (IllegalArgumentException e) {
-            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.");
+            // 잘못된 토큰
+            logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.", e);
         }
-        return false;
+        return false;  // 검증 실패
     }
 
     // JWT에서 시용자 정보 가져오기(토큰에서 정보 가져오기)
     public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();  // 검증할때와 비슷하다. 왜냐하면 가져오는 과정도 토큰을 까봐야하기 때문. Jwt는 Claim기반 웹 토큰이다.
+        // 검증할때와 비슷하다. 왜냐하면 가져오는 과정도 토큰을 까봐야하기 때문. Jwt는 Claim기반 웹 토큰이다.
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
+        log.info("쿠키 까보기 : {}", cookies);
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
@@ -115,6 +140,21 @@ public class JwtUtil {
                 }
             }
         }
-        return null;
+        throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
+    }
+
+    // 토큰 블랙리스트 여부 확인
+    public boolean isTokenBlacklisted(String token) {
+        log.info("만료된 토큰검증 시작합니다: {}", blacklistedTokens.contains(token));
+        log.info(blacklistedTokens.toString());
+        return blacklistedTokens.contains(token);
+    }
+
+    // 블랙리스트에 토큰 추가
+    public void addBlacklistToken(String token) {
+        // 토큰 Bearer제거
+        String subStringToken = substringToken(token);
+        log.info("Aftersubstr token : {}", subStringToken);
+        blacklistedTokens.add(subStringToken);
     }
 }
