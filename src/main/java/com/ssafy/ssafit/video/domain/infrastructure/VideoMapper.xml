@@ -5,16 +5,118 @@
 
 <mapper namespace="com.ssafy.ssafit.video.domain.repository.VideoDao">
 
-    <!--  영상 등록  -->
-    <insert id="insertVideo" parameterType="com.ssafy.ssafit.video.domain.model.Video" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO video (user_id, title, description, part, url, created_at, modified_at)
-        VALUES (#{userId}, #{title}, #{description}, #{part}, #{url}, NOW(), NOW());
+    <!-- 영상 등록 -->
+    <insert id="insertVideo" parameterType="Video" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO videos (
+                            user_id
+                            ,title
+                            ,description
+                            ,part
+                            ,url
+                            ,created_at
+                            ,modified_at
+        ) VALUES (
+                #{userId}
+                ,#{title}
+                ,#{description}
+                ,#{part}
+                ,#{url}
+                ,NOW()
+                ,NOW()
+        )
     </insert>
 
-    <!--  id로 영상 조회  -->
-    <select id="findById" resultType="com.ssafy.ssafit.video.domain.model.Video">
-        SELECT * FROM video WHERE id = #{id}
+    <!-- ID로 영상 조회 -->
+    <select id="findVideoById" parameterType="long" resultType="Video">
+        SELECT id
+             ,user_id
+             ,title
+             ,description
+             ,part
+             ,url
+             ,created_at
+             ,modified_at
+        FROM videos
+        WHERE id = #{id}
     </select>
 
+<!--    &lt;!&ndash; 전체 영상 목록 조회 &ndash;&gt;-->
+<!--    <select id="findAllVideo" resultType="Video">-->
+<!--        SELECT id,-->
+<!--             ,user_id-->
+<!--             ,title-->
+<!--             ,description-->
+<!--             ,part-->
+<!--             ,url-->
+<!--             ,created_at-->
+<!--             ,modified_at-->
+<!--        FROM videos-->
+<!--    </select>-->
+
+<!--    &lt;!&ndash; 제목으로 영상 조회 &ndash;&gt;-->
+<!--    <select id="findVideoByTitle" parameterType="string" resultType="Video">-->
+<!--        SELECT id-->
+<!--             ,user_id-->
+<!--             ,title-->
+<!--             ,description-->
+<!--             ,part-->
+<!--             ,url-->
+<!--             ,created_at-->
+<!--             ,modified_at-->
+<!--        FROM video-->
+<!--        WHERE title = #{title}-->
+<!--    </select>-->
+
+    <!-- 조건 검색 (title, parts, views, categories) -->
+    <select id="searchVideos" resultType="Video">
+        SELECT id
+            ,user_id
+            ,title
+            ,description
+            ,part
+            ,url
+            ,created_at
+            ,modified_at
+        FROM videos
+        WHERE 1 = 1
+        <if test="title != null and title != ''">
+            AND title LIKE CONCAT('%', #{title}, '%')
+        </if>
+        <if test="parts != null and parts.size() > 0">
+            AND part IN
+            <foreach collection="parts" item="p" open="(" separator="," close=")">
+                #{p}
+            </foreach>
+        </if>
+        <if test="categories != null and categories.size() > 0">
+            AND category IN
+            <foreach collection="categories" item="c" open="(" separator="," close=")">
+                #{c}
+            </foreach>
+        </if>
+
+        <if test="views != null and views == 1">
+            ORDER BY views DESC
+        </if>
+    </select>
+
+
+    <!-- 영상 정보 수정 -->
+    <update id="updateVideo" parameterType="Video">
+        UPDATE videos
+        SET title = #{title}
+            ,description = #{description}
+            ,part = #{part}
+            ,url = #{url}
+            ,modified_at = NOW()
+        WHERE id = #{id}
+    </update>
+
+    <!-- 영상 삭제 -->
+    <delete id="deleteVideo" parameterType="long">
+        DELETE
+        FROM videos
+        WHERE id = #{id}
+    </delete>
 
 </mapper>

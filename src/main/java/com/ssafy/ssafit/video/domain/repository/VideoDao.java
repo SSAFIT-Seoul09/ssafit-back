@@ -9,17 +9,21 @@ public interface VideoDao {
     void insertVideo(Video video);
 
     // ID로 영상 조회
-    Video findById(Long id);
+    Video findVideoById(Long id);
 
     // 전체 영상 목록 조회
-    List<Video> findAll();
+    // List<Video> findAllVideo();
 
     // 제목으로 영상 조회
-    Video findByTitle(String title);
+    // Video findVideoByTitle(String title);
 
-    // 영상 정보 수정
+    // 조건 검색 및 전체 조회
+    List<Video> searchVideos(String title, List<String> parts, Integer views, List<String> categories);
+
+    // 영상 수정
     void updateVideo(Video video);
 
     // 영상 삭제
     void deleteVideo(Long id);
+
 }
