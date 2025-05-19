@@ -18,7 +18,7 @@ public interface VideoDao {
     // Video findVideoByTitle(String title);
 
     // 조건 검색 및 전체 조회
-    List<Video> searchVideos(String title, List<String> parts, Integer views, List<String> categories);
+    List<Video> searchVideos(String title, List<String> parts, String order);
 
     // 영상 수정
     void updateVideo(Video video);

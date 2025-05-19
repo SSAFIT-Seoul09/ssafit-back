@@ -9,7 +9,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Video extends TimeStamped {
+public class  Video extends TimeStamped {
 
     private Long id;
     private Long userId;
@@ -36,7 +36,6 @@ public class Video extends TimeStamped {
                 .url(requestDto.getUrl())
                 .build();
     }
-
 
     /**
      * [수정 시 사용]

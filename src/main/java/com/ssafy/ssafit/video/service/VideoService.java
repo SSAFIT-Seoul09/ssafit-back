@@ -1,5 +1,6 @@
 package com.ssafy.ssafit.video.service;
 
+import com.ssafy.ssafit.video.dto.VideoRecommendationDto;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
 
@@ -10,11 +11,8 @@ public interface VideoService {
     // 영상 등록
     VideoResponseDto insertVideo(Long userId, VideoRequestDto requestDto);
 
-    // 전체 영상 목록 조회
-    // List<VideoResponseDto> getAllVideos();
-
     // 영상 전체 조회 및 조건 검색 통합
-    List<VideoResponseDto> searchVideos(String title, List<String> parts, Integer views, List<String> categories);
+    List<VideoResponseDto> searchVideos(String title, List<String> parts, Integer views);
 
 
     // 영상 상세 조회 (ID 기준)
@@ -25,4 +23,5 @@ public interface VideoService {
 
     // 영상 삭제
     void deleteVideo(Long userId, Long videoId);
+
 }

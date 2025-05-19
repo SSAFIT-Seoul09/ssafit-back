@@ -30,25 +30,18 @@ public class VideoServiceImpl implements VideoService {
         return VideoResponseDto.toDto(insertedVideo);
     }
 
-    // 전체 영상 목록 조회
-//    @Override
-//    public List<VideoResponseDto> getAllVideos() {
-//        List<Video> videos = videoDao.findAllVideo();
-//
-//        log.info("영상 목록: {}", videos);
-//        return videos.stream()
-//                .map(video -> VideoResponseDto.toDto(video))
-//                .toList();
-//
-//    }
-
     // 영상 전체 조회 + 조건 검색 통합
     @Override
-    public List<VideoResponseDto> searchVideos(String title, List<String> parts, Integer views, List<String> categories) {
-        List<Video> videos = videoDao.searchVideos(title, parts, views, categories);
+    public List<VideoResponseDto> searchVideos(String title, List<String> parts, Integer views) {
+        String order = null;
+        if (views != null) {
+            order = views == 0 ? "ASC" : "DESC";
+        }
 
-        log.info("영상 제목 : {}, 파트 : {}, 조회수 : {}, 카테고리 : {}", title, parts, views, categories);
-        log.info("검색 결과 영상 목록: {}", videos);
+        log.info("검색 방식: {}", order);
+        List<Video> videos = videoDao.searchVideos(title, parts, order);
+
+        log.info("영상 제목 : {}, 파트 : {}, 조회수 : {}", title, parts, order);
 
         return videos.stream()
                 .map(video -> VideoResponseDto.toDto(video))

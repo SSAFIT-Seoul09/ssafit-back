@@ -24,7 +24,6 @@ public enum VideoPart {
         throw InvalidVideoParameterException.ofPart(value);
     }
 
-
     public String getValue() {
         return value;
     }

@@ -3,6 +3,7 @@ package com.ssafy.ssafit.video.controller;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.annotation.LoginUser;
 import com.ssafy.ssafit.global.response.ApiResponse;
+import com.ssafy.ssafit.video.dto.VideoRecommendationDto;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
 import com.ssafy.ssafit.video.service.VideoService;
@@ -37,13 +38,12 @@ public class VideoController {
     public ResponseEntity<ApiResponse<List<VideoResponseDto>>> searchVideos(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) List<String> parts,
-            @RequestParam(required = false) Integer views,
-            @RequestParam(required = false) List<String> categories) {
+            @RequestParam(required = false) Integer views) {
 
-        log.info("영상 제목 : {}, 파트 : {}, 조회수 : {}, 카테고리 : {}",
-                title, parts, views, categories);
+        log.info("영상 제목 : {}, 파트 : {}, 조회수 : {}",
+                title, parts, views);
 
-        List<VideoResponseDto> responseList = videoService.searchVideos(title, parts, views, categories);
+        List<VideoResponseDto> responseList = videoService.searchVideos(title, parts, views);
         return ResponseEntity.ok(ApiResponse.success("영상 조회에 성공하였습니다.", responseList));
     }
 
