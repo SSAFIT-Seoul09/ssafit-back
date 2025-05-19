@@ -17,7 +17,7 @@
                ,#{password}
                ,#{nickname}
                ,#{age}
-               ,#{role}
+               ,#{role.value}
                )
     </insert>
 
@@ -39,6 +39,30 @@
         FROM users
         WHERE email = #{email}
     </select>
+
+    <select id="findUserById" parameterType="long" resultType="User">
+        SELECT *
+        FROM users
+        WHERE id = #{userId}
+    </select>
+
+    <update id="updateUser" parameterType="User">
+        UPDATE users
+        <set>
+            <if test="email != null">email = #{email},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="nickname != null">nickname = #{nickname},</if>
+            <if test="age != null">age = #{age},</if>
+            <if test="role != null">role = #{role},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteUser" parameterType="long">
+        DELETE FROM users
+        WHERE id = #{userId}
+    </delete>
+
 
 
 </mapper>
