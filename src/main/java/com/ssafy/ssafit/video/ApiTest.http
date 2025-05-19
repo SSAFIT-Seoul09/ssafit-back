@@ -1,0 +1,11 @@
+### 영상 등록 API 테스트
+POST http://localhost:8080/api/videos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "안녕",
+  "description": "하세요",
+  "part": "CHEST",
+  "url": "https://www.youtube.com"
+}
