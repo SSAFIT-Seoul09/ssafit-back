@@ -1,4 +1,4 @@
-package com.ssafy.ssafit.user.dto;
+package com.ssafy.ssafit.user.dto.response;
 
 import com.ssafy.ssafit.user.domain.model.User;
 import lombok.AllArgsConstructor;

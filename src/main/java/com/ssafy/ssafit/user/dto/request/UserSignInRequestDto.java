@@ -1,4 +1,4 @@
-package com.ssafy.ssafit.user.dto;
+package com.ssafy.ssafit.user.dto.request;
 
 import lombok.Getter;
 
