@@ -25,7 +25,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Slf4j // Logger를 가져오는 어노테이션
+@Slf4j(topic = "JwtUtil") // Logger를 가져오는 어노테이션
 @Component
 public class JwtUtil {
 
@@ -53,12 +53,14 @@ public class JwtUtil {
     public void init() {
         byte[] bytes = Base64.getDecoder().decode(secretKey);  //base64로 인코딩 된 키를 사용중이기 때문에 디코딩을 해주고 key로 사용해야한다.
         key = Keys.hmacShaKeyFor(bytes);    // 디코딩했으니 바이트값을 변환하여 사용하려는것이다.
+        log.info("JWT 키 초기화 완료");
     }
 
     // JWT 생성(토큰 생성)
     public String createToken(Long userId, UserRole role) {
         Date date = new Date();
 
+        log.info("JWT 토큰 생성 완료: userId={}, role={}, issuedAt={}", userId, role);
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(Long.toString(userId)) // 사용자 식별자값(ID). userId를 string으로 변환해서 넣어줌.
@@ -80,28 +82,28 @@ public class JwtUtil {
         cookie.setMaxAge(60 * 60);     // 1시간 유효
 
         res.addCookie(cookie);
+        log.debug("JWT 토큰을 쿠키에 저장 완료: {}", cookie.getName());
     }
 
     // Cookie에 들어있던 JWT 토큰을 Substring(토큰 앞에 Bearer와 공백을 붙여주기 때문에 토큰을 가져올때에는 substring을 해서 앞에 부분을 제거해서 사용해야한다.
     public String substringToken(String tokenValue) {
-        log.info("Beforesubstr token : {}", tokenValue);
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
             return tokenValue.substring(7); // Bearer + " " 총 7개.
         }
-        logger.error("Not Found Token");
-        throw new NullPointerException("Not Found Token");
+        log.error("유효하지 않은 토큰 형식 (Bearer 없음)");
+        throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // JWT 검증(토큰 검증)
     public boolean validateToken(String token) {
         try {
-
             // JWT 토큰 검증
             Jwts.parserBuilder()
                     .setSigningKey(key)  // 서명 키 설정
                     .build()
                     .parseClaimsJws(token);  // 토큰 파싱 및 검증
 
+            log.debug("JWT 토큰 유효성 검증 성공");
             return true;  // 검증 성공
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             // 서명 문제 또는 변조된 토큰
@@ -121,6 +123,7 @@ public class JwtUtil {
 
     // JWT에서 시용자 정보 가져오기(토큰에서 정보 가져오기)
     public Claims getUserInfoFromToken(String token) {
+        log.debug("JWT 토큰에서 사용자 정보 추출 시작");
         // 검증할때와 비슷하다. 왜냐하면 가져오는 과정도 토큰을 까봐야하기 때문. Jwt는 Claim기반 웹 토큰이다.
         return Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -136,17 +139,18 @@ public class JwtUtil {
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
+                    log.debug("JWT 쿠키 발견: {}", cookie.getName());
                     return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8); // Encode 되어 넘어간 Value 다시 Decode
                 }
             }
         }
+        log.warn("JWT 쿠키를 찾을 수 없음");
         throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 토큰 블랙리스트 여부 확인
     public boolean isTokenBlacklisted(String token) {
-        log.info("만료된 토큰검증 시작합니다: {}", blacklistedTokens.contains(token));
-        log.info(blacklistedTokens.toString());
+        log.debug("블랙리스트 조회 결과: {} → {}", token);
         return blacklistedTokens.contains(token);
     }
 
@@ -154,7 +158,7 @@ public class JwtUtil {
     public void addBlacklistToken(String token) {
         // 토큰 Bearer제거
         String subStringToken = substringToken(token);
-        log.info("Aftersubstr token : {}", subStringToken);
         blacklistedTokens.add(subStringToken);
+        log.info("토큰 블랙리스트에 추가됨: {}", subStringToken);
     }
 }

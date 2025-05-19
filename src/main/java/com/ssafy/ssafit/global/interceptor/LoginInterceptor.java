@@ -16,7 +16,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
  * 사용자가 요청을 넣을때, webconfig에서 열어놓지 않은 api로 요청을 넣을때 인터셉터가
  * 실행된다.
  */
-@Slf4j(topic = "JWT 토큰 로그인 검증")
+@Slf4j(topic = "LoginInterceptor - JWT 토큰 로그인 검증")
 @RequiredArgsConstructor
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
@@ -25,6 +25,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     /**
      * 로그인 여부를 확인하고, 로그인되지 않았다면 false, or else trues
+     *
      * @param request
      * @param response
      * @param handler
@@ -33,16 +34,15 @@ public class LoginInterceptor implements HandlerInterceptor {
      */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        log.info("요청시 토큰 검증 시작 : {}", jwtUtil.getTokenFromRequest(request));
+        log.info("요청 인터셉트: URI={}, Method={}", request.getRequestURI(), request.getMethod());
+
         // 1. 쿠키에서 토큰 까보기
         String tokenValue = jwtUtil.getTokenFromRequest(request);
         if (tokenValue == null) {
-            log.info("토큰이 존재하지 않습니다.");
+            log.warn("JWT 토큰 없음 - 요청 거부: URI={}", request.getRequestURI());
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
-
-        log.info("토큰 추출: {}", tokenValue); // 추가된 로그
 
         // 2. Bearer 제거
         String token;
@@ -50,14 +50,14 @@ public class LoginInterceptor implements HandlerInterceptor {
 
         // 3-1. 로그아웃 처리 된 토큰인지 확인
         if (jwtUtil.isTokenBlacklisted(token)) {
-            log.info("로그아웃된 토큰입니다.");
+            log.warn("블랙리스트 처리된 JWT 토큰 - 접근 차단");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
 
         // 3-2. 토큰 유효성 검사
         if (!jwtUtil.validateToken(token)) {
-            log.info("토큰에 문제가 있습니다.");
+            log.warn("JWT 토큰 유효성 실패 - 접근 차단");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return false;
         }
@@ -72,12 +72,13 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 6. ThreadLocal에 저장
         UserContext.setUser(authenticatedUser);
 
-        log.info("토큰 검증 완료 : {}", authenticatedUser.getUserId());
+        log.info("JWT 인증 성공: userId={}, role={}", authenticatedUser.getUserId(), authenticatedUser.getRole());
         return true;
     }
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         UserContext.clear(); // 요청 끝나면 반드시 클리어. securityContextHolder가 유저의 정보를 없애버리는 것과 같은 맥락
+        log.debug("UserContext 클리어 완료 - 요청 종료: URI={}", request.getRequestURI());
     }
 }
