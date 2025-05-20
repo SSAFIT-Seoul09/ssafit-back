@@ -25,7 +25,7 @@ public class VideoResponseDto {
                 .videoId(video.getId())
                 .title(video.getTitle())
                 .description(video.getDescription())
-                .part(video.getPart().getValue()) // enum → String 변환
+                .part(video.getPart().getValue())
                 .url(video.getUrl())
                 .createdAt(video.getCreatedAt())
                 .modifiedAt(video.getModifiedAt())
