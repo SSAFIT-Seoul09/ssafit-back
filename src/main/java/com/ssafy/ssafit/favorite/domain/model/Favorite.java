@@ -1,6 +1,5 @@
 package com.ssafy.ssafit.favorite.domain.model;
 
-import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
 import lombok.*;
 
 @Getter

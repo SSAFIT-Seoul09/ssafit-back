@@ -6,9 +6,26 @@
 <mapper namespace="com.ssafy.ssafit.favorite.domain.repository.FavoriteDao">
 
     <insert id="insertFavorite" parameterType="Favorite" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO favorite (user_id, video_id)
+        INSERT INTO favorites (user_id, video_id)
         VALUES (#{userId}, #{videoId})
     </insert>
+    
+    <select id="isFavorite" resultType="boolean">
+        SELECT COUNT(*) > 0
+        FROM favorites
+        WHERE user_id = #{userId} AND video_id = #{videoId}
+    </select>
+
+    <delete id="removeFavorite" parameterType="Favorite">
+        DELETE FROM favorites
+        WHERE user_id = #{userId} AND video_id = #{videoId};
+    </delete>
+
+    <select id="getAllById" parameterType="long" resultType="Favorite">
+        SELECT *
+        FROM favorites
+        WHERE user_id = #{userId}
+    </select>
 
 
 </mapper>
