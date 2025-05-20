@@ -1,6 +1,5 @@
 package com.ssafy.ssafit.video.service;
 
-import com.ssafy.ssafit.video.dto.VideoRecommendationDto;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
 
