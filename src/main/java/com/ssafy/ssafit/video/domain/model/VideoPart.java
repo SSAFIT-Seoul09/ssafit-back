@@ -1,7 +1,5 @@
 package com.ssafy.ssafit.video.domain.model;
 
-import com.ssafy.ssafit.video.exception.InvalidVideoParameterException;
-
 public enum VideoPart {
     ARM("ARM"),
     LEG("LEG"),
@@ -21,7 +19,7 @@ public enum VideoPart {
                 return part;
             }
         }
-        throw InvalidVideoParameterException.ofPart(value);
+        throw new IllegalArgumentException("추후 재정의");
     }
 
     public String getValue() {
