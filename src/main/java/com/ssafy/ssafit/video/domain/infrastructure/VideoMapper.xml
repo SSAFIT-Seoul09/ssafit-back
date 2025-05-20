@@ -13,43 +13,25 @@
                             ,description
                             ,part
                             ,url
-                            ,created_at
-                            ,modified_at
         ) VALUES (
                 #{userId}
                 ,#{title}
                 ,#{description}
                 ,#{part}
                 ,#{url}
-                ,NOW()
-                ,NOW()
         )
     </insert>
 
     <!-- ID로 영상 조회 -->
     <select id="findVideoById" parameterType="long" resultType="Video">
-        SELECT id
-             ,user_id
-             ,title
-             ,description
-             ,part
-             ,url
-             ,created_at
-             ,modified_at
+        SELECT *
         FROM videos
         WHERE id = #{id}
     </select>
 
     <!-- 조건 검색 (title, parts, views, categories) -->
     <select id="searchVideos" resultType="Video">
-        SELECT id
-            ,user_id
-            ,title
-            ,description
-            ,part
-            ,url
-            ,created_at
-            ,modified_at
+        SELECT *
         FROM videos
         WHERE 1 = 1
         <if test="title != null and title != ''">
@@ -74,7 +56,6 @@
             ,description = #{description}
             ,part = #{part}
             ,url = #{url}
-            ,modified_at = NOW()
         WHERE id = #{id}
     </update>
 
