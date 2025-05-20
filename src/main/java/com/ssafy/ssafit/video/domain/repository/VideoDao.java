@@ -11,12 +11,6 @@ public interface VideoDao {
     // ID로 영상 조회
     Video findVideoById(Long id);
 
-    // 전체 영상 목록 조회
-    // List<Video> findAllVideo();
-
-    // 제목으로 영상 조회
-    // Video findVideoByTitle(String title);
-
     // 조건 검색 및 전체 조회
     List<Video> searchVideos(String title, List<String> parts, String order);
 

@@ -3,7 +3,6 @@ package com.ssafy.ssafit.video.controller;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.annotation.LoginUser;
 import com.ssafy.ssafit.global.response.ApiResponse;
-import com.ssafy.ssafit.video.dto.VideoRecommendationDto;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
 import com.ssafy.ssafit.video.service.VideoService;
