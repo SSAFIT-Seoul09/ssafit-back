@@ -5,7 +5,6 @@ import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
-import com.ssafy.ssafit.video.exception.VideoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,7 +52,7 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public VideoResponseDto getVideoById(Long videoId) {
         Video video = Optional.ofNullable(videoDao.findVideoById(videoId))
-                .orElseThrow(() -> VideoNotFoundException.ofId(videoId));
+                .orElseThrow(() -> new IllegalArgumentException("추후 재정의"));
         return VideoResponseDto.toDto(video);
     }
 
@@ -61,7 +60,7 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public VideoResponseDto updateVideo(Long userId, Long videoId, VideoRequestDto requestDto) {
         Video video = Optional.ofNullable(videoDao.findVideoById(videoId))
-                .orElseThrow(() -> VideoNotFoundException.ofId(videoId));
+                .orElseThrow(() -> new IllegalArgumentException("추후 재정의"));
 
         // 영상 정보 수정
         video.setUserId(userId);
@@ -79,7 +78,7 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void deleteVideo(Long userId, Long videoId) {
         Video video = Optional.ofNullable(videoDao.findVideoById(videoId))
-                .orElseThrow(() -> VideoNotFoundException.ofId(videoId));
+                .orElseThrow(() -> new IllegalArgumentException("추후 재정의"));
         videoDao.deleteVideo(video.getId());
     }
 }
