@@ -58,7 +58,8 @@ public class UserController {
 
     // 회원 정보 수정
     @PutMapping
-    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@LoginUser AuthenticatedUser authenticatedUser, @RequestBody UpdateUserDetailRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@LoginUser AuthenticatedUser authenticatedUser,
+                                                                         @RequestBody UpdateUserDetailRequestDto requestDto) {
         log.info("회원정보 수정: {}", authenticatedUser.getUserId());
         UserDetailResponseDTO responseDTO = userService.updateUser(authenticatedUser.getUserId(), requestDto);
         return ResponseEntity.ok(ApiResponse.success("회원 정보 수정에 성공하였습니다.", responseDTO));

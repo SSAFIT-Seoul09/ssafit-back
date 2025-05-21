@@ -5,5 +5,57 @@
 
 <mapper namespace="com.ssafy.ssafit.review.domain.repository.ReviewDao">
 
+    <insert id="insertReview" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO reviews (
+            user_id
+            , video_id
+            , title
+            , content
+            , rating
+        ) VALUES (
+            #{userId}
+            , #{videoId}
+            , #{title}
+            , #{content}
+            , #{rating}
+        )
+    </insert>
+
+    <select id="getReviewById" resultType="Review" parameterType="Long">
+        SELECT *
+        FROM reviews
+        WHERE id = #{id}
+    </select>
+
+    <select id="getAllReviews" resultType="Review">
+        SELECT *
+        FROM reviews
+    </select>
+
+    <select id="getReviewByVideoId" resultType="Review" parameterType="Long">
+        SELECT *
+        FROM reviews
+        WHERE video_id = #{videoId}
+    </select>
+
+    <select id="getReviewByVideoIdAndReviewId" resultType="Review">
+        SELECT *
+        FROM reviews
+        WHERE id = #{reviewId}
+    </select>
+
+    <update id="updateReview" parameterType="Review">
+        UPDATE reviews
+        SET title = #{title},
+        content = #{content},
+        rating = #{rating},
+        modified_at = NOW()
+        WHERE id = #{id} AND user_id = #{userId};
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM reviews
+        WHERE id = #{id}
+    </delete>
 
 </mapper>
