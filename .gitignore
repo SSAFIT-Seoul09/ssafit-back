@@ -57,3 +57,5 @@ build/
 ### etc. ###
 db.properties
 **/.DS_Store
+
+HELP.md
