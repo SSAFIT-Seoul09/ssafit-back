@@ -71,10 +71,10 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         // 객체 업데이트
-        Review updateReview = review.update(requestDto);
+        review.update(requestDto);
 
         // 디비 업데이트
-        int isUpdated = reviewDao.updateReview(updateReview);
+        int isUpdated = reviewDao.updateReview(review);
         if (isUpdated <= 0) {
             throw new IllegalArgumentException("업데이트에 실패하였습니다");
         }

@@ -1,6 +1,7 @@
 package com.ssafy.ssafit.video.domain.repository;
 
 import com.ssafy.ssafit.video.domain.model.Video;
+
 import java.util.List;
 
 public interface VideoDao {

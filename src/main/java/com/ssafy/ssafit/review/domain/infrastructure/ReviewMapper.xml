@@ -49,7 +49,6 @@
         SET title = #{title},
         content = #{content},
         rating = #{rating},
-        modified_at = NOW()
         WHERE id = #{id} AND user_id = #{userId};
     </update>
 
