@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 
         validatePassword(requestDto.getPassword(), user.getPassword());
 
-        String token = jwtUtil.createToken(user.getId(), user.getRole());
+        String token = jwtUtil.createToken(user.getId(), user.getNickname(), user.getRole());
         jwtUtil.addJwtToCookie(token, response);
 
         log.info("로그인 성공: userId={}, email={}", user.getId(), user.getEmail());
