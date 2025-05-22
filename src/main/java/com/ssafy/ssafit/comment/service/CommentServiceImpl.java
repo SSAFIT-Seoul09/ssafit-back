@@ -4,6 +4,8 @@ import com.ssafy.ssafit.comment.domain.model.Comment;
 import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
+import com.ssafy.ssafit.comment.exception.CommentException;
+import com.ssafy.ssafit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,72 +24,98 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     @Override
     public CommentResponseDto createComment(Long userId, Long reviewId, CommentRequestDto requestDto) {
+        log.info("댓글 작성 요청: userId={}, reviewId={}, requestDto={}", userId, reviewId, requestDto);
+
         // 댓글 작성
         Comment comment = Comment.of(userId, reviewId, requestDto);
+        log.debug("댓글 객체 생성: {}", comment);
 
         // 디비 저장
         commentDao.insertComment(comment);
+        log.info("댓글 DB 저장 완료: commentId={}", comment.getId());
 
         // 조회
         Comment insertedComment = commentDao.findById(comment.getId());
+        if(insertedComment != null) {
+            log.error("댓글 삽입 실패: commentId={}", comment.getId());
+            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
+        }
 
+        log.info("댓글 작성 성공: commentId={}", insertedComment.getId());
         // 반환
         return CommentResponseDto.toDto(insertedComment);
     }
 
     @Override
     public List<CommentResponseDto> getComments(Long reviewId) {
+        log.info("리뷰에 대한 댓글 조회 요청: reviewId={}", reviewId);
         List<CommentResponseDto> list = commentDao.findByReviewId(reviewId);
         if (list.isEmpty()) {
-            throw new IllegalArgumentException("리뷰에 댓글이 없습니다.");
+            log.error("댓글 없음: reviewId={}", reviewId);
+            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
         }
+        log.info("댓글 조회 성공: reviewId={}, 댓글 수={}", reviewId, list.size());
         return list;
     }
 
     @Transactional
     @Override
     public CommentResponseDto update(Long userId, Long commentId, CommentRequestDto requestDto) {
-        Comment comment = commentDao.findById(commentId);
+        log.info("댓글 수정 요청: userId={}, commentId={}, requestDto={}", userId, commentId, requestDto);
+
 
         // 댓글 존재 여부 확인
-        if (comment == null) {
-            throw new IllegalArgumentException("댓글이 존재하지 않습니다.");
-        }
+        Comment comment = getComment(commentId);
 
         // 작성자와 수정하려는 사람이 같은지 확인.
         if(comment.getUserId() != userId) {
-            throw new IllegalArgumentException("수정 권한이 없습니다.");
+            log.error("수정 권한 없음: userId={}는 commentId={}의 수정 권한이 없습니다.", userId, commentId);
+            throw CommentException.of(ErrorCode.UNAUTHORIZED_COMMENT_UPDATE);
         }
 
         comment.update(requestDto);
+        log.debug("댓글 수정 내용: {}", comment);
 
         int isUpdated = commentDao.updateComment(comment);
         if (isUpdated <= 0) {
-            throw new IllegalArgumentException("댓글 수정에 문제가 생겼습니다.");
+            log.error("댓글 수정 실패: commentId={}", commentId);
+            throw CommentException.of(ErrorCode.COMMENT_UPDATE_FAILURE);
         }
 
+        log.info("댓글 수정 성공: commentId={}", commentId);
         return CommentResponseDto.toDto(comment);
     }
 
     @Transactional
     @Override
     public void deleteComment(Long userId, Long commentId) {
-        Comment comment = commentDao.findById(commentId);
+        log.info("댓글 삭제 요청: userId={}, commentId={}", userId, commentId);
 
-        // 본인 댓글인지 확인
-        if (comment == null) {
-            throw new IllegalArgumentException("존재하지 않는 댓글입니다.");
-        }
 
         // 댓글 존재 유무 확인
+        Comment comment = getComment(commentId);
+
+        // 본인 댓글인지 확인
         if(comment.getUserId() != userId) {
-            throw new IllegalArgumentException("해당 댓글 수정 권한이 없습니다.");
+            log.error("삭제 권한 없음: userId={}는 commentId={}의 삭제 권한이 없습니다.", userId, commentId);
+            throw CommentException.of(ErrorCode.UNAUTHORIZED_COMMENT_DELETE);
         }
 
         // 댓글 삭제 성공 여부
         int isDeleted = commentDao.deleteById(commentId);
         if (isDeleted <= 0) {
-            throw new IllegalArgumentException("댓글 삭제에 실패하였습니다.");
+            log.error("댓글 삭제 실패: commentId={}", commentId);
+            throw CommentException.of(ErrorCode.COMMENT_DELETE_FAILURE);
         }
+        log.info("댓글 삭제 성공: commentId={}", commentId);
+    }
+
+    private Comment getComment(Long commentId) {
+        Comment comment = commentDao.findById(commentId);
+        if (comment == null) {
+            log.error("댓글 없음: commentId={}", commentId);
+            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
+        }
+        return comment;
     }
 }

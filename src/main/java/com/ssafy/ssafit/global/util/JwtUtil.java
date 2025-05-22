@@ -22,10 +22,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j(topic = "JwtUtil") // Logger를 가져오는 어노테이션
 @Component
@@ -110,7 +107,7 @@ public class JwtUtil {
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             // 서명 문제 또는 변조된 토큰
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
-            throw TokenException.of(ErrorCode.INVALID_TOKEN_SIGNATURE)
+            throw TokenException.of(ErrorCode.INVALID_TOKEN_SIGNATURE);
         } catch (ExpiredJwtException e) {
             // 만료된 토큰
             logger.error("Expired JWT token, 만료된 JWT token 입니다.", e);
@@ -140,7 +137,7 @@ public class JwtUtil {
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
-        log.info("쿠키 까보기 : {}", cookies);
+        log.info("쿠키 개봉 : {}", Arrays.stream(cookies).toList());
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {

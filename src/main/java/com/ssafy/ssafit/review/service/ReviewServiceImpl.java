@@ -1,9 +1,11 @@
 package com.ssafy.ssafit.review.service;
 
+import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.review.domain.model.Review;
 import com.ssafy.ssafit.review.domain.repository.ReviewDao;
 import com.ssafy.ssafit.review.dto.request.ReviewRequestDto;
 import com.ssafy.ssafit.review.dto.response.ReviewResponseDto;
+import com.ssafy.ssafit.review.exception.ReviewException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,7 +34,7 @@ public class ReviewServiceImpl implements ReviewService {
         log.debug("리뷰 삽입 확인 완료");
 
         if (insertedReview == null) {
-            throw new IllegalArgumentException("예외처리");
+            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
         }
         log.info("리뷰 작성 성공: {}", insertedReview.getId());
         return ReviewResponseDto.toDto(insertedReview);
@@ -40,62 +42,80 @@ public class ReviewServiceImpl implements ReviewService {
 
     @Override
     public List<ReviewResponseDto> getAllReviews() {
+        log.info("모든 리뷰 조회 요청");
+
         List<ReviewResponseDto> list = reviewDao.getAllReviews();
+        log.debug("리뷰 목록 조회 결과: {}개", list.size());
+
         if (list.isEmpty()) {
-            throw new IllegalArgumentException("리뷰가 존재하지 않습니다");
+            log.error("리뷰 목록이 비어있음");
+            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
         }
         return list;
     }
 
     @Override
     public List<ReviewResponseDto> getReview(Long videoId, Long reviewId) {
+        log.info("특정 리뷰 조회 요청: videoId={}, reviewId={}", videoId, reviewId);
+
         List<ReviewResponseDto> list = getReviews(videoId, reviewId);
 
         if (list.isEmpty()) {
-            throw new IllegalArgumentException("리뷰가 존재하지 않습니다");
+            log.error("리뷰 조회 실패: videoId={}, reviewId={}", videoId, reviewId);
+            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
         }
+
+        log.info("리뷰 조회 성공: videoId={}, reviewId={}", videoId, reviewId);
         return list;
     }
 
     @Transactional
     @Override
     public ReviewResponseDto updateReview(Long userId, Long reviewId, ReviewRequestDto requestDto) {
-        Review review = reviewDao.getReviewById(reviewId);
-        if (review == null) {
-            throw new IllegalArgumentException("존재하지 않는 리뷰입니다");
-        }
+        log.info("리뷰 수정 요청: userId={}, reviewId={}, requestDto={}", userId, reviewId, requestDto);
+
+        Review review = getReview(reviewId);
 
         // 본인 작성 리뷰인지 확인
         if (!Objects.equals(review.getUserId(), userId)) {
-            throw new IllegalArgumentException("수정권한이 없습니다.");
+            log.error("수정 권한 없음: userId={}는 reviewId={}의 수정 권한이 없습니다.", userId, reviewId);
+            throw ReviewException.of(ErrorCode.REVIEW_UPDATE_UNAUTHORIZED);
         }
 
         // 객체 업데이트
         review.update(requestDto);
+        log.debug("리뷰 수정 내용: {}", review);
 
         // 디비 업데이트
         int isUpdated = reviewDao.updateReview(review);
         if (isUpdated <= 0) {
-            throw new IllegalArgumentException("업데이트에 실패하였습니다");
+            log.error("리뷰 수정 실패: reviewId={}", reviewId);
+            throw ReviewException.of(ErrorCode.REVIEW_UPDATE_FAILURE);
         }
 
         Review insertedReview = reviewDao.getReviewById(reviewId);
+        log.info("리뷰 수정 완료: reviewId={}", insertedReview.getId());
+        if (insertedReview == null) {
+            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+        }
+
         return ReviewResponseDto.toDto(insertedReview);
     }
 
     @Transactional
     @Override
     public void deleteReview(Long userId, Long reviewId) {
+        log.info("리뷰 삭제 요청: userId={}, reviewId={}", userId, reviewId);
+
         // 존재 여부 확인
-        Review review = reviewDao.getReviewById(reviewId);
-        if (review == null) {
-            throw new IllegalArgumentException("존재하지 않는 리뷰입니다.");
-        }
+        getReview(reviewId);
 
         int isDeleted = reviewDao.deleteById(reviewId);
         if (isDeleted <= 0) {
-            throw new IllegalArgumentException("리뷰 삭제에 실패하였습니다.");
+            log.error("리뷰 삭제 실패: reviewId={}", reviewId);
+            throw ReviewException.of(ErrorCode.REVIEW_DELETE_FAILURE);
         }
+        log.info("리뷰 삭제 완료: reviewId={}", reviewId);
     }
 
     private List<ReviewResponseDto> getReviews(Long videoId, Long reviewId) {
@@ -106,5 +126,13 @@ public class ReviewServiceImpl implements ReviewService {
         }
     }
 
-
+    // 리뷰 존재 여부 확인
+    private Review getReview(Long reviewId) {
+        Review review = reviewDao.getReviewById(reviewId);
+        if (review == null) {
+            log.error("리뷰 없음: reviewId={}", reviewId);
+            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+        }
+        return review;
+    }
 }

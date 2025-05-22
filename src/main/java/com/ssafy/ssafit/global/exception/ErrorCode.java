@@ -9,13 +9,13 @@ public enum ErrorCode {
     /**
      * 에러 코드 규칙
      * - 4xxx : 클라이언트 에러
-     *
+     * <p>
      * - 5xxx : 서버 에러
-     *  - 51xx : 일반적인 서버 에러
-     *  - 52xx : 데이터베이스 관련 에러
-     *
+     * - 51xx : 일반적인 서버 에러
+     * - 52xx : 데이터베이스 관련 에러
      */
 
+    // 4000번대: 클라이언트 요청 오류
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, 4001, "잘못된 입력입니다."),
     INVALID_TYPE_VALUE(HttpStatus.BAD_REQUEST, 4002, "잘못된 타입의 값입니다."),
     EMAIL_ALREADY_EXISTS(HttpStatus.CONFLICT, 4003, "이미 존재하는 이메일입니다."),
@@ -28,16 +28,34 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40010, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, 4011, "지원되지 않는 JWT 토큰입니다."),
     INVALID_JWT_CLAIMS(HttpStatus.BAD_REQUEST, 4012, "잘못된 JWT 토큰입니다."),
+
+    // 4010번대: 리소스 관련 오류
+    VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 4013, "해당 비디오를 찾을 수 없습니다."),
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, 4014, "해당 리뷰를 찾을 수 없습니다."),
+    REVIEW_UPDATE_UNAUTHORIZED(HttpStatus.FORBIDDEN, 4015, "수정 권한이 없습니다."),
+    REVIEW_UPDATE_FAILURE(HttpStatus.BAD_REQUEST, 4016, "영상 업데이트에 실패했습니다."),
+    REVIEW_DELETE_FAILURE(HttpStatus.BAD_REQUEST, 4017, "영상 삭제에 실패했습니다."),
+
+    // 4500번대: 댓글 관련 오류
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 4501, "댓글을 찾을 수 없습니다."),
+    UNAUTHORIZED_COMMENT_UPDATE(HttpStatus.FORBIDDEN, 4502, "본인 댓글만 수정 가능합니다."),
+    COMMENT_UPDATE_FAILURE(HttpStatus.BAD_REQUEST, 4503, "댓글 수정에 실패했습니다."),
+    COMMENT_DELETE_FAILURE(HttpStatus.BAD_REQUEST, 4504, "댓글 삭제에 실패했습니다."),
+    UNAUTHORIZED_COMMENT_DELETE(HttpStatus.FORBIDDEN, 4505, "본인 댓글만 삭제 가능합니다."),
+
+    // 찜 관련 에러 코드
+    FAVORITE_ALREADY_EXISTS(HttpStatus.CONFLICT, 4601, "이미 찜한 영상입니다."),
+    FAVORITE_NOT_FOUND(HttpStatus.NOT_FOUND, 4602, "찜한 영상을 찾을 수 없습니다."),
+    FAVORITE_INSERT_FAILURE(HttpStatus.BAD_REQUEST, 4603, "찜 등록에 실패했습니다."),
+    FAVORITE_DELETE_FAILURE(HttpStatus.BAD_REQUEST, 4604, "찜 삭제에 실패했습니다."),
+    UNAUTHORIZED_FAVORITE_UPDATE(HttpStatus.FORBIDDEN, 4605, "찜 등록 권한이 없습니다."),
+
+    // 5000번대: 서버 오류
     COOKIE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "쿠키를 찾을 수 없습니다."),
-
-
-    INVALID_CREDENTIAL(HttpStatus.UNAUTHORIZED, 4005, "이메일 또는 비밀번호를 잘못 입력하였습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "서버 오류가 발생했습니다."),
 
-    // GPT로 임의로 설정해놓은 에러코드,
-    DUPLICATE_RESOURCE(HttpStatus.BAD_REQUEST, 4003, "이미 존재하는 리소스입니다."),
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 4010, "인증이 필요합니다."),
-    RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, 4040, "리소스를 찾을 수 없습니다.");
+    // 기타 일반적인 오류
+    INVALID_CREDENTIAL(HttpStatus.UNAUTHORIZED, 4006, "이메일 또는 비밀번호를 잘못 입력하였습니다.");
 
     private final HttpStatus status;
     private final int code;
