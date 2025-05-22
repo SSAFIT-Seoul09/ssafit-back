@@ -22,12 +22,17 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, 4004, "존재하지 않는 사용자입니다."),
     SIGN_UP_FAILURE(HttpStatus.BAD_REQUEST, 4005, "회원가입에 실패했습니다."),
     USER_UPDATE_FAILURE(HttpStatus.BAD_REQUEST, 4006, "회원정보 수정에 실패했습니다."),
-    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 4006, "토큰을 찾을 수 없습니다."),
+    TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND, 4007, "토큰을 찾을 수 없습니다."),
+    TOKEN_CREATION_FAILURE(HttpStatus.INTERNAL_SERVER_ERROR, 4008, "토큰 생성에 실패했습니다."),
+    INVALID_TOKEN_SIGNATURE(HttpStatus.UNAUTHORIZED, 4009, "유효하지 않는 JWT 서명입니다."),
+    EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40010, "만료된 JWT 토큰입니다."),
+    UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, 4011, "지원되지 않는 JWT 토큰입니다."),
+    INVALID_JWT_CLAIMS(HttpStatus.BAD_REQUEST, 4012, "잘못된 JWT 토큰입니다."),
+    COOKIE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "쿠키를 찾을 수 없습니다."),
 
 
     INVALID_CREDENTIAL(HttpStatus.UNAUTHORIZED, 4005, "이메일 또는 비밀번호를 잘못 입력하였습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "서버 오류가 발생했습니다."),
-
 
     // GPT로 임의로 설정해놓은 에러코드,
     DUPLICATE_RESOURCE(HttpStatus.BAD_REQUEST, 4003, "이미 존재하는 리소스입니다."),

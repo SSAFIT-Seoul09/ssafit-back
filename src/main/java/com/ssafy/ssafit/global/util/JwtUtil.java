@@ -1,6 +1,8 @@
 package com.ssafy.ssafit.global.util;
 
 import com.ssafy.ssafit.global.exception.ErrorCode;
+import com.ssafy.ssafit.global.util.exception.CookieException;
+import com.ssafy.ssafit.global.util.exception.TokenException;
 import com.ssafy.ssafit.user.domain.model.UserRole;
 import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import io.jsonwebtoken.*;
@@ -57,7 +59,7 @@ public class JwtUtil {
     }
 
     // JWT 생성(토큰 생성)
-    public String createToken(Long userId, UserRole role) {
+    public String createToken(Long userId, UserRole role) throws TokenException {
         Date date = new Date();
 
         log.info("JWT 토큰 생성 완료: userId={}, role={}, issuedAt={}", userId, role);
@@ -72,7 +74,7 @@ public class JwtUtil {
     }
 
     // 생성된 JWT를 Cookie에 저장
-    public void addJwtToCookie(String token, HttpServletResponse res) {
+    public void addJwtToCookie(String token, HttpServletResponse res) throws CookieException {
         token = URLEncoder.encode(token, StandardCharsets.UTF_8).replaceAll("\\+", "%20");
 
         Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);   // Name-Value. header와 토큰을 값으로 넣어줌
@@ -108,17 +110,20 @@ public class JwtUtil {
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
             // 서명 문제 또는 변조된 토큰
             logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.", e);
+            throw TokenException.of(ErrorCode.INVALID_TOKEN_SIGNATURE)
         } catch (ExpiredJwtException e) {
             // 만료된 토큰
             logger.error("Expired JWT token, 만료된 JWT token 입니다.", e);
+            throw TokenException.of(ErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
             // 지원되지 않는 토큰
             logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.", e);
+            throw TokenException.of(ErrorCode.UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException e) {
             // 잘못된 토큰
             logger.error("JWT claims is empty, 잘못된 JWT 토큰 입니다.", e);
+            throw TokenException.of(ErrorCode.INVALID_JWT_CLAIMS);
         }
-        return false;  // 검증 실패
     }
 
     // JWT에서 시용자 정보 가져오기(토큰에서 정보 가져오기)
@@ -145,7 +150,7 @@ public class JwtUtil {
             }
         }
         log.warn("JWT 쿠키를 찾을 수 없음");
-        throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
+        throw CookieException.of(ErrorCode.COOKIE_NOT_FOUND);
     }
 
     // 토큰 블랙리스트 여부 확인
