@@ -11,10 +11,6 @@ import lombok.Getter;
 @Getter
 public class EmailAlreadyExistException extends BusinessException {
 
-    private EmailAlreadyExistException() {
-        super(ErrorCode.EMAIL_ALREADY_EXISTS);
-    }
-
     private EmailAlreadyExistException(String message) {
         super(ErrorCode.EMAIL_ALREADY_EXISTS, message);
     }

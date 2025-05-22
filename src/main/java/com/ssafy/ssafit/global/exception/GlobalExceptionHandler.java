@@ -2,6 +2,7 @@ package com.ssafy.ssafit.global.exception;
 
 import com.ssafy.ssafit.global.response.ApiResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -10,11 +11,12 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
 
-@Slf4j
+@Slf4j(topic = "GlobalExceptionHandler")
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -22,7 +24,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BusinessException.class)
     public ResponseEntity<ApiResponse<Object>> handleBusinessException(BusinessException e) {
         ErrorCode errorCode = e.getErrorCode();
-        log.error("BusinessException: code={}, message={}", errorCode.getCode(), e.getMessage(), e);
+        log.error("BusinessException: code={}, message={}, cause={}", errorCode.getCode(), e.getMessage(), e.getCause());
         return ResponseEntity
                 .status(errorCode.getStatus())
                 .body(ApiResponse.error(errorCode, e.getMessage()));
@@ -50,13 +52,24 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleMethodArgumentTypeMismatch(
             MethodArgumentTypeMismatchException ex) {
         log.error("Type mismatch: {}", ex.getMessage(), ex);
-        String message = String.format("잘못된 타입의 값이 입력되었습니다. '%s' 필드에는 '%s' 타입이 필요합니다.",
-                ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "알 수 없음");
+
+        String message = String.format("잘못된 타입의 값이 입력되었습니다. '%s' 필드에는 '%s' 타입이 필요합니다. 요청한 값: %s",
+                ex.getName(), ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "알 수 없음", ex.getValue());
 
         return ResponseEntity
                 .status(ErrorCode.INVALID_TYPE_VALUE.getStatus())
                 .body(ApiResponse.error(ErrorCode.INVALID_TYPE_VALUE, message));
     }
+
+    // 데이터베이스 예외 처리
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<ApiResponse<Object>> handleSQLException(SQLException ex) {
+        log.error("Database error occurred: {}", ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR, "데이터베이스 처리 중 오류가 발생했습니다."));
+    }
+
 
     // 기타 예외 처리
     @ExceptionHandler(Exception.class)

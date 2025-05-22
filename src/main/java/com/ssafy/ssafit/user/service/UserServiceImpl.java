@@ -77,6 +77,23 @@ public class UserServiceImpl implements UserService {
         return UserSignInResponseDto.toDto(user, token);
     }
 
+    // 로그아웃
+    @Override
+    public void logout(HttpServletRequest request) {
+        log.info("로그아웃 요청");
+
+        // 1. 쿠키에서 토큰 꺼내기
+        String token = jwtUtil.getTokenFromRequest(request);
+        if (token == null) {
+            log.warn("로그아웃 실패 - 토큰 없음");
+            throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
+        }
+
+        // 2. 블랙리스트에 추가
+        jwtUtil.addBlacklistToken(token);
+        log.info("로그아웃 성공 - 토큰 블랙리스트에 추가됨");
+    }
+
     // 회원정보 조회
     @Override
     public UserDetailResponseDTO getUserInfo(Long userId) {
@@ -97,7 +114,7 @@ public class UserServiceImpl implements UserService {
     public UserDetailResponseDTO updateUser(Long userId, UpdateUserDetailRequestDto requestDto) {
         log.info("회원 정보 수정 요청: userId={}", userId);
 
-        // 존재하는 회원인지 확인
+        // 등록된 회원인지 확인
         User checkUser = userDao.findUserById(userId);
         if (checkUser == null) {
             log.warn("회원 정보 수정 실패 - 존재하지 않음: userId={}", userId);
@@ -134,30 +151,13 @@ public class UserServiceImpl implements UserService {
         log.info("회원 탈퇴 성공: userId={}", userId);
     }
 
-    // 로그아웃
-    @Override
-    public void logout(HttpServletRequest request) {
-        log.info("로그아웃 요청");
-
-        // 1. 쿠키에서 토큰 꺼내기
-        String token = jwtUtil.getTokenFromRequest(request);
-        if (token == null) {
-            log.warn("로그아웃 실패 - 토큰 없음");
-            throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
-        }
-
-        // 2. 블랙리스트에 추가
-        jwtUtil.addBlacklistToken(token);
-        log.info("로그아웃 성공 - 토큰 블랙리스트에 추가됨");
-    }
-
     private User getUserByEmail(String email) {
         log.debug("이메일로 회원 조회: email={}", email);
 
         return Optional.ofNullable(userDao.findUserByEmail(email))
                 .orElseThrow(() -> {
                     log.warn("회원 조회 실패 - 존재하지 않는 이메일: {}", email);
-                    return InvalidUserCredentialException.ofEmail(email);
+                    throw InvalidUserCredentialException.ofEmail(email);
                 });
     }
 
