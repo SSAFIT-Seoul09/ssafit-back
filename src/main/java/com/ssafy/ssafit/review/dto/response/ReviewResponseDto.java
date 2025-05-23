@@ -15,6 +15,7 @@ public class ReviewResponseDto {
     private String title;
     private String content;
     private int rating;
+    private int views;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -26,6 +27,7 @@ public class ReviewResponseDto {
                 .title(insertedReview.getTitle())
                 .content(insertedReview.getContent())
                 .rating(insertedReview.getRating())
+                .views(insertedReview.getViews())
                 .createdAt(insertedReview.getCreatedAt())
                 .modifiedAt(insertedReview.getModifiedAt())
                 .build();
