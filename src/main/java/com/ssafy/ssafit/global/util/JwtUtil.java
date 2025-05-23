@@ -4,7 +4,6 @@ import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.global.util.exception.CookieException;
 import com.ssafy.ssafit.global.util.exception.TokenException;
 import com.ssafy.ssafit.user.domain.model.UserRole;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -22,7 +21,10 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j(topic = "JwtUtil") // Logger를 가져오는 어노테이션
 @Component

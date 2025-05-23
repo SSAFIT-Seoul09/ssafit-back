@@ -26,7 +26,7 @@ public class LoginInterceptor implements HandlerInterceptor {
     private final JwtUtil jwtUtil;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         log.info("요청 인터셉트: URI={}, Method={}", request.getRequestURI(), request.getMethod());
 
         // 1. 쿠키에서 토큰 까보기
@@ -55,7 +55,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 5. AuthenticatedUser 객체에 JWT토큰의 사용자 정보 저장
         AuthenticatedUser authenticatedUser = AuthenticatedUser.of(claims);
 
-        // 6. ThreadLocal에 저장
+        // 6. ThreadLocal 저장
         UserContext.setUser(authenticatedUser);
 
         log.info("JWT 인증 성공: userId={}, role={}", authenticatedUser.getUserId(), authenticatedUser.getRole());
