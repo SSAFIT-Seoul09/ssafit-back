@@ -1,5 +1,6 @@
 package com.ssafy.ssafit.video.service;
 
+import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
@@ -12,6 +13,7 @@ import com.ssafy.ssafit.video.exception.VideoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -49,10 +51,10 @@ public class VideoServiceImpl implements VideoService {
     public List<VideoResponseDto> searchVideos(String title, List<String> parts, Integer views) {
         String order = null;
         if (views != null) {
-            order = views == 0 ? "ASC" : "DESC";
+            order = views == 0 ? null : "DESC";
         }
 
-        log.info("검색 시작 - 제목: {}, 파트: {}, 조회수: {}, 정렬: {}", title, parts, views, order);
+        log.info("검색 시작 - 제목: {}, 파트: {}, 조회수: {}, 정렬여부(null or DESC): {}", title, parts, views, order);
         List<Video> videos = videoDao.searchVideos(title, parts, order);
 
         log.info("검색된 영상 목록 개수: {}", videos.size());
@@ -64,9 +66,12 @@ public class VideoServiceImpl implements VideoService {
 
 
     // 영상 상세 조회
+    @Transactional
     @Override
     public VideoResponseDto getVideoById(Long videoId) {
         log.info("영상 상세 조회 시작: videoId={}", videoId);
+        videoDao.increaseViewCnt(videoId);
+
         Video video = getVideo(videoId);
 
         log.info("영상 상세 조회 완료: {}", video);
@@ -83,6 +88,8 @@ public class VideoServiceImpl implements VideoService {
 
         // TODO : 본인이 등록한 비디오인지 확인하는 작업. VideoAccessForbiddentException 클래스를 만들어서 사용하자.
 
+
+        // TODO : 영상 수정 빌더 패턴 적용
         // 영상 정보 수정
         video.setUserId(userId);
         video.setTitle(requestDto.getTitle());

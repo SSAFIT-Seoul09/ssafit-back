@@ -44,7 +44,7 @@
             </foreach>
         </if>
         <if test="order != null">
-            ORDER BY views ${order}
+            ORDER BY views DESC
         </if>
     </select>
 
@@ -65,5 +65,12 @@
         FROM videos
         WHERE id = #{id}
     </delete>
+
+    <!-- 조회수 증가 -->
+    <update id="increaseViewCnt" parameterType="long">
+        UPDATE videos
+        SET views = views + 1
+        WHERE id = #{videoId}
+    </update>
 
 </mapper>
