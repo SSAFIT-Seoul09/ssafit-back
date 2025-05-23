@@ -40,14 +40,24 @@ public class LoginInterceptor implements HandlerInterceptor {
         }
 
         // 0-1.각 도메인별로 경로 예외처리
-        // 리뷰 도메인 경로 제외
-        if (isPublicGetForReview(request)) {
-            log.info("GET 요청 인증 제외 : URI={}, Method={}", uri, method);
+        // 로그인 회원가입
+        if (isPublicForUser(request)) {
+            log.info("로그인 및 회원가입 인증 제외 : URI={}, Method={}", uri, method);
             return true;
         }
         // 비디오 도메인 경로 제외
         if (isPublicGetForVideo(request)) {
-            log.info("GET 요청 인증 제외 : URI={}, Method={}", uri, method);
+            log.info("Video GET 요청 인증 제외 : URI={}, Method={}", uri, method);
+            return true;
+        }
+        // 리뷰 도메인 경로 제외
+        if (isPublicGetForReview(request)) {
+            log.info("Review GET 요청 인증 제외 : URI={}, Method={}", uri, method);
+            return true;
+        }
+        // 댓글
+        if(isPublicGetForComment(request)) {
+            log.info("Comment GET 요청 인증 제외 : URI={}, Method={}", uri, method);
             return true;
         }
 
@@ -90,6 +100,13 @@ public class LoginInterceptor implements HandlerInterceptor {
         log.debug("UserContext 클리어 완료 - 요청 종료: URI={}", request.getRequestURI());
     }
 
+    private boolean isPublicForUser(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+
+        return antPathMatcher.match(uri, "/api/users/signin")
+                || antPathMatcher.match(uri, "/api/users/signup");
+    }
+
     private boolean isPublicGetForReview(HttpServletRequest req) {
         String uri = req.getRequestURI();
         String method = req.getMethod();
@@ -108,6 +125,14 @@ public class LoginInterceptor implements HandlerInterceptor {
                 antPathMatcher.match("/api/videos/*", uri)
                         || antPathMatcher.match("/api/videos/search", uri)
         );
+    }
+
+    private boolean isPublicGetForComment(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+        String method = req.getMethod();
+
+        return "GET".equalsIgnoreCase(method) &&
+                antPathMatcher.match("/api/comments/*", uri);
     }
 
 }
