@@ -147,8 +147,8 @@ public class JwtUtil {
                 }
             }
         }
-        log.warn("JWT 쿠키를 찾을 수 없음");
-        throw CookieException.of(ErrorCode.COOKIE_NOT_FOUND);
+        log.warn("JWT 토큰를 찾을 수 없음");
+        throw CookieException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 토큰 블랙리스트 여부 확인

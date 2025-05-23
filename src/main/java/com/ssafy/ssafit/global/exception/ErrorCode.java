@@ -54,7 +54,6 @@ public enum ErrorCode {
     // 찜 관련 에러 코드
     FAVORITE_VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 4602, "찜한 영상을 찾을 수 없습니다."),
     // 5000번대: 서버 오류
-    COOKIE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "쿠키를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "서버 오류가 발생했습니다.");
 
     private final HttpStatus status;
