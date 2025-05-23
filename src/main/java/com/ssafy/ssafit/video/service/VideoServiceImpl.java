@@ -1,19 +1,17 @@
 package com.ssafy.ssafit.video.service;
 
-import com.fasterxml.jackson.databind.annotation.JsonAppend;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
 import com.ssafy.ssafit.video.exception.VideoDeleteException;
-import com.ssafy.ssafit.video.exception.VideoUpdatedException;
 import com.ssafy.ssafit.video.exception.VideoInsertException;
 import com.ssafy.ssafit.video.exception.VideoNotFoundException;
+import com.ssafy.ssafit.video.exception.VideoUpdatedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
