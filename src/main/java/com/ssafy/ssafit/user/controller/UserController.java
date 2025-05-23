@@ -7,6 +7,7 @@ import com.ssafy.ssafit.user.dto.request.UpdateUserDetailRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignInRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignUpRequestDto;
 import com.ssafy.ssafit.user.dto.response.UserDetailResponseDTO;
+import com.ssafy.ssafit.user.dto.response.UserPostCntResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignInResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignUpResponseDto;
 import com.ssafy.ssafit.user.service.UserService;
@@ -43,7 +44,7 @@ public class UserController {
     // 로그아웃
     @PostMapping
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request) {
-        log.info("로그아웃 컨트롤러 요청");
+        log.info("로그아웃 요청");
         userService.logout(request);
         return ResponseEntity.ok(ApiResponse.success("로그아웃에 성공하였습니다"));
     }
@@ -51,7 +52,7 @@ public class UserController {
     // 회원 정보 조회
     @GetMapping
     public ResponseEntity<ApiResponse<UserDetailResponseDTO>> getUserInfo(@LoginUser AuthenticatedUser authenticatedUser) {
-        log.info("회원정보 조회: {}", authenticatedUser.getUserId());
+        log.info("회원정보 조회 - 회원ID: {}", authenticatedUser.getUserId());
         UserDetailResponseDTO responseDto = userService.getUserInfo(authenticatedUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("회원 정보 조회에 성공하였습니다.", responseDto));
     }
@@ -60,7 +61,7 @@ public class UserController {
     @PutMapping
     public ResponseEntity<ApiResponse<UserDetailResponseDTO>> updateUser(@LoginUser AuthenticatedUser authenticatedUser,
                                                                          @RequestBody UpdateUserDetailRequestDto requestDto) {
-        log.info("회원정보 수정: {}", authenticatedUser.getUserId());
+        log.info("회원정보 수정 - 회원ID: {}", authenticatedUser.getUserId());
         UserDetailResponseDTO responseDTO = userService.updateUser(authenticatedUser.getUserId(), requestDto);
         return ResponseEntity.ok(ApiResponse.success("회원 정보 수정에 성공하였습니다.", responseDTO));
     }
@@ -68,8 +69,16 @@ public class UserController {
     // 회원 탈퇴
     @DeleteMapping
     public ResponseEntity<ApiResponse<Void>> deleteUser(@LoginUser AuthenticatedUser authenticatedUser) {
-        log.info("회원탈퇴 : {}", authenticatedUser.getUserId());
+        log.info("회원탈퇴 - 회원ID: {}", authenticatedUser.getUserId());
         userService.deleteUser(authenticatedUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("회원 탈퇴에 성공하였습니다."));
+    }
+
+    // 작성 글 개수 조회
+    @GetMapping("/info")
+    public ResponseEntity<ApiResponse<UserPostCntResponseDto>> getMyInfo(@LoginUser AuthenticatedUser authenticatedUser) {
+        log.info("회원 게시물 개수 조회 - 회원ID: {}", authenticatedUser.getUserId());
+        UserPostCntResponseDto responseDto = userService.getUserPostCnt(authenticatedUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("게시글 개수 조회 성공", responseDto));
     }
 }

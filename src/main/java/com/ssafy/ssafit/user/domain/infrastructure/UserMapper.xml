@@ -63,6 +63,15 @@
         WHERE id = #{userId}
     </delete>
 
+    <select id="getUserPostCnt" parameterType="long" resultType="UserPostCntResponseDto">
+        SELECT
+                (SELECT COUNT(*) FROM videos    WHERE user_id = #{userId})    AS videoCount,
+                (SELECT COUNT(*) FROM reviews    WHERE user_id = #{userId})    AS reviewCount,
+                (SELECT COUNT(*) FROM comments  WHERE user_id = #{userId})    AS commentCount,
+                (SELECT COUNT(*) FROM favorites WHERE user_id = #{userId})    AS favoriteCount
+    </select>
+
+
 
 
 </mapper>
