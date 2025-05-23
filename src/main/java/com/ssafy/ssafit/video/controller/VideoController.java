@@ -48,7 +48,7 @@ public class VideoController {
 
     // 영상 상세 조회
     @GetMapping("/{videoId}")
-    public ResponseEntity<ApiResponse<VideoResponseDto>> getVideoById(@PathVariable Long videoId) {
+    public ResponseEntity<ApiResponse<VideoResponseDto>> getVideoById(@PathVariable(name = "videoId") Long videoId) {
         VideoResponseDto responseDto = videoService.getVideoById(videoId);
         return ResponseEntity.ok(ApiResponse.success("영상 상세 조회에 성공하였습니다.", responseDto));
     }
@@ -57,7 +57,7 @@ public class VideoController {
     @PutMapping("/{videoId}")
     public ResponseEntity<ApiResponse<VideoResponseDto>> updateVideo(
             @LoginUser AuthenticatedUser user,
-            @PathVariable Long videoId,
+            @PathVariable(name = "videoId") Long videoId,
             @RequestBody VideoRequestDto requestDto) {
         VideoResponseDto responseDto = videoService.updateVideo(user.getUserId(), videoId, requestDto);
         return ResponseEntity.ok(ApiResponse.success("영상 정보 수정에 성공하였습니다.", responseDto));
@@ -67,8 +67,7 @@ public class VideoController {
     @DeleteMapping("/{videoId}")
     public ResponseEntity<ApiResponse<Void>> deleteVideo(
             @LoginUser AuthenticatedUser authenticatedUser,
-            @PathVariable Long videoId) {
-
+            @PathVariable(name = "videoId") Long videoId) {
         Long userId = authenticatedUser.getUserId();
         log.info("사용자 ID: {}, 영상 Id: {}", userId, videoId);
 
