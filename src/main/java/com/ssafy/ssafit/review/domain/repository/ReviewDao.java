@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ReviewDao {
 
-    void insertReview(Review review);
+    int insertReview(Review review);
 
     Review getReviewById(Long id);
 

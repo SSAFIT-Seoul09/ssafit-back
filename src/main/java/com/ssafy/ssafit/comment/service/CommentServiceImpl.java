@@ -4,7 +4,7 @@ import com.ssafy.ssafit.comment.domain.model.Comment;
 import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
-import com.ssafy.ssafit.comment.exception.CommentException;
+import com.ssafy.ssafit.comment.exception.*;
 import com.ssafy.ssafit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,14 +31,18 @@ public class CommentServiceImpl implements CommentService {
         log.debug("댓글 객체 생성: {}", comment);
 
         // 디비 저장
-        commentDao.insertComment(comment);
+        int isInserted = commentDao.insertComment(comment);
+        if (isInserted <= 0) {
+            log.info("댓글 등록 실패 : userId : {}, reviewId: {}, {}", userId, reviewId, requestDto);
+            throw CommentInsertException.of(userId);
+        }
         log.info("댓글 DB 저장 완료: commentId={}", comment.getId());
 
         // 조회
         Comment insertedComment = commentDao.findById(comment.getId());
         if(insertedComment != null) {
             log.error("댓글 삽입 실패: commentId={}", comment.getId());
-            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
+            throw CommentNotFoundException.of();
         }
 
         log.info("댓글 작성 성공: commentId={}", insertedComment.getId());
@@ -52,7 +56,7 @@ public class CommentServiceImpl implements CommentService {
         List<CommentResponseDto> list = commentDao.findByReviewId(reviewId);
         if (list.isEmpty()) {
             log.error("댓글 없음: reviewId={}", reviewId);
-            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
+            throw CommentNotFoundException.of();
         }
         log.info("댓글 조회 성공: reviewId={}, 댓글 수={}", reviewId, list.size());
         return list;
@@ -70,7 +74,7 @@ public class CommentServiceImpl implements CommentService {
         // 작성자와 수정하려는 사람이 같은지 확인.
         if(comment.getUserId() != userId) {
             log.error("수정 권한 없음: userId={}는 commentId={}의 수정 권한이 없습니다.", userId, commentId);
-            throw CommentException.of(ErrorCode.UNAUTHORIZED_COMMENT_UPDATE);
+            throw CommentAccessForbiddenException.of(commentId);
         }
 
         comment.update(requestDto);
@@ -79,7 +83,7 @@ public class CommentServiceImpl implements CommentService {
         int isUpdated = commentDao.updateComment(comment);
         if (isUpdated <= 0) {
             log.error("댓글 수정 실패: commentId={}", commentId);
-            throw CommentException.of(ErrorCode.COMMENT_UPDATE_FAILURE);
+            throw CommentUpdateException.of(commentId);
         }
 
         log.info("댓글 수정 성공: commentId={}", commentId);
@@ -98,14 +102,14 @@ public class CommentServiceImpl implements CommentService {
         // 본인 댓글인지 확인
         if(comment.getUserId() != userId) {
             log.error("삭제 권한 없음: userId={}는 commentId={}의 삭제 권한이 없습니다.", userId, commentId);
-            throw CommentException.of(ErrorCode.UNAUTHORIZED_COMMENT_DELETE);
+            throw CommentAccessForbiddenException.of(commentId);
         }
 
         // 댓글 삭제 성공 여부
         int isDeleted = commentDao.deleteById(commentId);
         if (isDeleted <= 0) {
             log.error("댓글 삭제 실패: commentId={}", commentId);
-            throw CommentException.of(ErrorCode.COMMENT_DELETE_FAILURE);
+            throw CommentDeleteException.of(commentId);
         }
         log.info("댓글 삭제 성공: commentId={}", commentId);
     }
@@ -114,7 +118,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentDao.findById(commentId);
         if (comment == null) {
             log.error("댓글 없음: commentId={}", commentId);
-            throw CommentException.of(ErrorCode.COMMENT_NOT_FOUND);
+            throw CommentNotFoundException.of();
         }
         return comment;
     }

@@ -5,11 +5,15 @@ import com.ssafy.ssafit.global.exception.ErrorCode;
 
 public class UserNotFoundException extends BusinessException {
 
-    private UserNotFoundException(ErrorCode errorCode) {
-        super(errorCode);
+    private UserNotFoundException(String messages) {
+        super(ErrorCode.TOKEN_NOT_FOUND, messages);
     }
 
-    public static UserNotFoundException of(ErrorCode errorCode) {
-        return new UserNotFoundException(errorCode);
+    public static UserNotFoundException of(String messages) {
+        return new UserNotFoundException(messages);
+    }
+
+    public static UserNotFoundException ofUserId(Long userId) {
+        return new UserNotFoundException("회원 ID" + userId + "를 찾을 수 없습니다.");
     }
 }

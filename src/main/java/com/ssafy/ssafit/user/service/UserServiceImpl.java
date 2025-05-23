@@ -10,10 +10,7 @@ import com.ssafy.ssafit.user.dto.request.UserSignUpRequestDto;
 import com.ssafy.ssafit.user.dto.response.UserDetailResponseDTO;
 import com.ssafy.ssafit.user.dto.response.UserSignInResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignUpResponseDto;
-import com.ssafy.ssafit.user.exception.EmailAlreadyExistException;
-import com.ssafy.ssafit.user.exception.InvalidUserCredentialException;
-import com.ssafy.ssafit.user.exception.SignUpFailureException;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
+import com.ssafy.ssafit.user.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +55,7 @@ public class UserServiceImpl implements UserService {
             return UserSignUpResponseDto.toDto(savedUser);
         } else {
             log.error("회원가입 실패: email={}", requestDto.getEmail());
-            throw SignUpFailureException.of(ErrorCode.SIGN_UP_FAILURE);
+            throw SignUpFailureException.of("회원가입에 실패하였습니다.");
         }
     }
 
@@ -86,7 +83,7 @@ public class UserServiceImpl implements UserService {
         String token = jwtUtil.getTokenFromRequest(request);
         if (token == null) {
             log.warn("로그아웃 실패 - 토큰 없음");
-            throw UserNotFoundException.of(ErrorCode.TOKEN_NOT_FOUND);
+            throw UserNotFoundException.of("토큰이 없습니다");
         }
 
         // 2. 블랙리스트에 추가
@@ -101,7 +98,7 @@ public class UserServiceImpl implements UserService {
         User user = userDao.findUserById(userId);
         if(user == null) {
             log.warn("회원 정보 조회 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.of(ErrorCode.USER_NOT_FOUND);
+            throw UserNotFoundException.ofUserId(userId);
         }
 
         log.debug("회원 정보 조회 성공: userId={}", userId);
@@ -118,7 +115,7 @@ public class UserServiceImpl implements UserService {
         User checkUser = userDao.findUserById(userId);
         if (checkUser == null) {
             log.warn("회원 정보 수정 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.of(ErrorCode.USER_NOT_FOUND);
+            throw UserNotFoundException.ofUserId(userId);
         }
 
         User user = User.from(userId, requestDto);
@@ -133,7 +130,7 @@ public class UserServiceImpl implements UserService {
             return UserDetailResponseDTO.toDto(user);
         } else {
             log.error("회원 정보 수정 실패(DB update 실패): userId={}", userId);
-            throw UserNotFoundException.of(ErrorCode.USER_UPDATE_FAILURE);
+            throw UserUpdateFailureException.of(userId);
         }
     }
 
@@ -145,7 +142,7 @@ public class UserServiceImpl implements UserService {
 
         if (userDao.deleteUser(userId) < 0) {
             log.warn("회원 탈퇴 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.of(ErrorCode.USER_NOT_FOUND);
+            throw UserDeleteFailureException.of(userId);
         }
 
         log.info("회원 탈퇴 성공: userId={}", userId);
