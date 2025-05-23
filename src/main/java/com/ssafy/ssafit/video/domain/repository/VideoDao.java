@@ -7,7 +7,7 @@ import java.util.List;
 public interface VideoDao {
 
     // 영상 등록
-    void insertVideo(Video video);
+    int insertVideo(Video video);
 
     // ID로 영상 조회
     Video findVideoById(Long id);
@@ -16,9 +16,9 @@ public interface VideoDao {
     List<Video> searchVideos(String title, List<String> parts, String order);
 
     // 영상 수정
-    void updateVideo(Video video);
+    int updateVideo(Video video);
 
     // 영상 삭제
-    void deleteVideo(Long id);
+    int deleteVideo(Long id);
 
 }

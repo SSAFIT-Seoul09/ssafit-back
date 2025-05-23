@@ -4,8 +4,11 @@ import com.ssafy.ssafit.favorite.domain.model.Favorite;
 import com.ssafy.ssafit.favorite.domain.repository.FavoriteDao;
 import com.ssafy.ssafit.favorite.dto.UserFavoriteDto;
 import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
-import com.ssafy.ssafit.favorite.exception.FavoriteException;
+import com.ssafy.ssafit.favorite.exception.FavoriteNotFoundException;
 import com.ssafy.ssafit.global.exception.ErrorCode;
+import com.ssafy.ssafit.video.domain.model.Video;
+import com.ssafy.ssafit.video.domain.repository.VideoDao;
+import com.ssafy.ssafit.video.exception.VideoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,10 +21,18 @@ import java.util.List;
 public class FavoriteServiceImpl implements FavoriteService {
 
     private final FavoriteDao favoriteDao;
+    private final VideoDao videoDao;
 
     @Override
     public FavoriteResponseDto addFavorite(Long userId, Long videoId) {
         log.info("사용자 ID: {}과 영상 ID: {}에 대한 찜 작업이 시작되었습니다.", userId, videoId);
+
+        // 존재하는 영상인지 확인
+        Video isExistVideo = videoDao.findVideoById(videoId);
+        if (isExistVideo == null) {
+            log.info("찜 등록 실패. 존재하지 않는 영상입니다. {}", videoId);
+            throw VideoNotFoundException.of(videoId);
+        }
 
         Favorite favorite = Favorite.of(userId, videoId);
 
@@ -49,7 +60,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         List<UserFavoriteDto> favorites = favoriteDao.getAllById(userId);
         if (favorites.isEmpty()) {
             log.error("사용자 ID: {}에 대한 찜 목록이 비어있음", userId);
-            throw FavoriteException.of(ErrorCode.FAVORITE_NOT_FOUND); // 찜 목록이 비어있을 경우
+            throw FavoriteNotFoundException.of(userId);
         }
 
         log.info("사용자 ID: {}에 대한 찜 목록 조회 성공, 개수: {}", userId, favorites.size());

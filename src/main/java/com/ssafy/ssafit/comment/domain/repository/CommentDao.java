@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface CommentDao {
 
-    void insertComment(Comment comment);
+    int insertComment(Comment comment);
 
     Comment findById(Long id);
 

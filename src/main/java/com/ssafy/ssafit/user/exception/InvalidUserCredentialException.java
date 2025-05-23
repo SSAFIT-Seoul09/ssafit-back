@@ -5,15 +5,15 @@ import com.ssafy.ssafit.global.exception.ErrorCode;
 
 public class InvalidUserCredentialException extends BusinessException {
 
-    private InvalidUserCredentialException(String message) {
-        super(ErrorCode.INVALID_CREDENTIAL, message);
+    private InvalidUserCredentialException(ErrorCode errorCode, String message) {
+        super(errorCode, message);
     }
 
     public static InvalidUserCredentialException ofEmail(String email) {
-        return new InvalidUserCredentialException("이메일을 잘못 입력하였습니다 : " + email);
+        return new InvalidUserCredentialException(ErrorCode.EMAIL_NOT_FOUND, "이메일을 잘못 입력하였습니다 : " + email);
     }
 
     public static InvalidUserCredentialException ofPassword() {
-        return new InvalidUserCredentialException("비밀번호를 잘못 입력하였습니다.");
+        return new InvalidUserCredentialException(ErrorCode.INVALID_PASSWORD, "비밀번호를 잘못 입력하였습니다.");
     }
 }

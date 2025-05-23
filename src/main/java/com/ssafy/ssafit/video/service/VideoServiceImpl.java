@@ -1,11 +1,13 @@
 package com.ssafy.ssafit.video.service;
 
-import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
+import com.ssafy.ssafit.video.exception.VideoDeleteException;
+import com.ssafy.ssafit.video.exception.VideoUpdatedException;
+import com.ssafy.ssafit.video.exception.VideoInsertException;
 import com.ssafy.ssafit.video.exception.VideoNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +32,11 @@ public class VideoServiceImpl implements VideoService {
         log.info("영상 등록 시작: userId={}, videoRequestDto={}", userId, requestDto);
 
         Video video = Video.from(userId, requestDto);
-        videoDao.insertVideo(video);
+        int inserted = videoDao.insertVideo(video);
+        if (inserted <= 0) {
+            log.error("영상 등록 실패: userId={}, videoRequestDto={}", userId, requestDto);
+            throw VideoInsertException.of("영상 등록에 실패하였습니다.");
+        }
 
         Video insertedVideo = videoDao.findVideoById(video.getId());
         log.info("영상 등록 완료: videoId={}", video.getId());
@@ -75,6 +81,8 @@ public class VideoServiceImpl implements VideoService {
 
         Video video = getVideo(videoId);
 
+        // TODO : 본인이 등록한 비디오인지 확인하는 작업. VideoAccessForbiddentException 클래스를 만들어서 사용하자.
+
         // 영상 정보 수정
         video.setUserId(userId);
         video.setTitle(requestDto.getTitle());
@@ -82,7 +90,12 @@ public class VideoServiceImpl implements VideoService {
         video.setPart(VideoPart.from(requestDto.getPart()));
         video.setUrl(requestDto.getUrl());
 
-        videoDao.updateVideo(video);
+        int isUpdated = videoDao.updateVideo(video);
+        if (isUpdated <= 0) {
+            log.error("영상 등록 실패: videoId={}, videoRequestDto={}", videoId, requestDto);
+            throw VideoUpdatedException.of(videoId);
+        }
+
 
         log.info("영상 수정 완료: videoId={}", videoId);
 
@@ -100,7 +113,11 @@ public class VideoServiceImpl implements VideoService {
 
         Video video = getVideo(videoId);
 
-        videoDao.deleteVideo(video.getId());
+        int isDeleted = videoDao.deleteVideo(video.getId());
+        if (isDeleted <= 0) {
+            log.info("영상 삭제 실패: videoId={}", videoId);
+            throw VideoDeleteException.of(videoId);
+        }
         log.info("영상 삭제 완료: videoId={}", videoId);
     }
 
@@ -108,7 +125,7 @@ public class VideoServiceImpl implements VideoService {
         Video video = Optional.ofNullable(videoDao.findVideoById(videoId))
                 .orElseThrow(() -> {
                     log.error("영상 조회 실패: videoId={} (영상 없음)", videoId);
-                    throw VideoNotFoundException.of(ErrorCode.VIDEO_NOT_FOUND);
+                    throw VideoNotFoundException.of(videoId);
                 });
         return video;
     }

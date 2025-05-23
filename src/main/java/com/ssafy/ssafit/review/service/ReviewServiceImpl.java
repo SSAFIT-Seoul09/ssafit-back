@@ -5,7 +5,7 @@ import com.ssafy.ssafit.review.domain.model.Review;
 import com.ssafy.ssafit.review.domain.repository.ReviewDao;
 import com.ssafy.ssafit.review.dto.request.ReviewRequestDto;
 import com.ssafy.ssafit.review.dto.response.ReviewResponseDto;
-import com.ssafy.ssafit.review.exception.ReviewException;
+import com.ssafy.ssafit.review.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,14 +27,18 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponseDto createReview(Long userId, Long videoId, ReviewRequestDto requestDto) {
         log.info("리뷰 작성 요청 : {} {} {}",userId, videoId, requestDto);
         Review review = Review.of(userId, videoId, requestDto);
-        reviewDao.insertReview(review);
+
+        int isInserted = reviewDao.insertReview(review);
+        if(isInserted <= 0) {
+            log.info("리뷰 등록 실패 : {} {} {}",userId, videoId, requestDto);
+            throw ReviewInsertException.of(userId);
+        }
         log.debug("리뷰 작성 삽입 완료");
 
         Review insertedReview = reviewDao.getReviewById(review.getId());
-        log.debug("리뷰 삽입 확인 완료");
 
         if (insertedReview == null) {
-            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+            throw ReviewNotFoundException.of(insertedReview.getId());
         }
         log.info("리뷰 작성 성공: {}", insertedReview.getId());
         return ReviewResponseDto.toDto(insertedReview);
@@ -49,7 +53,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (list.isEmpty()) {
             log.error("리뷰 목록이 비어있음");
-            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+            throw ReviewNotFoundException.of();
         }
         return list;
     }
@@ -62,7 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
 
         if (list.isEmpty()) {
             log.error("리뷰 조회 실패: videoId={}, reviewId={}", videoId, reviewId);
-            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+            throw ReviewNotFoundException.of(reviewId);
         }
 
         log.info("리뷰 조회 성공: videoId={}, reviewId={}", videoId, reviewId);
@@ -79,7 +83,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 본인 작성 리뷰인지 확인
         if (!Objects.equals(review.getUserId(), userId)) {
             log.error("수정 권한 없음: userId={}는 reviewId={}의 수정 권한이 없습니다.", userId, reviewId);
-            throw ReviewException.of(ErrorCode.REVIEW_UPDATE_UNAUTHORIZED);
+            throw ReviewAccessUnauthorized.of(reviewId);
         }
 
         // 객체 업데이트
@@ -90,14 +94,15 @@ public class ReviewServiceImpl implements ReviewService {
         int isUpdated = reviewDao.updateReview(review);
         if (isUpdated <= 0) {
             log.error("리뷰 수정 실패: reviewId={}", reviewId);
-            throw ReviewException.of(ErrorCode.REVIEW_UPDATE_FAILURE);
+            throw ReviewUpdateException.of(reviewId);
         }
 
         Review insertedReview = reviewDao.getReviewById(reviewId);
-        log.info("리뷰 수정 완료: reviewId={}", insertedReview.getId());
         if (insertedReview == null) {
-            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+            log.info("리뷰 수정 실패: reviewId={}", insertedReview.getId());
+            throw ReviewNotFoundException.of(insertedReview.getId());
         }
+        log.info("리뷰 수정 완료: reviewId={}", insertedReview.getId());
 
         return ReviewResponseDto.toDto(insertedReview);
     }
@@ -113,7 +118,7 @@ public class ReviewServiceImpl implements ReviewService {
         int isDeleted = reviewDao.deleteById(reviewId);
         if (isDeleted <= 0) {
             log.error("리뷰 삭제 실패: reviewId={}", reviewId);
-            throw ReviewException.of(ErrorCode.REVIEW_DELETE_FAILURE);
+            throw ReviewDeleteException.of(reviewId);
         }
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
     }
@@ -131,7 +136,7 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = reviewDao.getReviewById(reviewId);
         if (review == null) {
             log.error("리뷰 없음: reviewId={}", reviewId);
-            throw ReviewException.of(ErrorCode.REVIEW_NOT_FOUND);
+            throw ReviewNotFoundException.of(reviewId);
         }
         return review;
     }
