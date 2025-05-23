@@ -31,7 +31,7 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
                                   NativeWebRequest webRequest,
-                                  WebDataBinderFactory binderFactory) throws Exception {
+                                  WebDataBinderFactory binderFactory) {
 
         // 현재 저장된 유저의 정보를 가져온다.
         AuthenticatedUser authenticatedUser = UserContext.getUser();

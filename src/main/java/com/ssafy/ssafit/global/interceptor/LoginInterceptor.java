@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 
@@ -24,14 +25,29 @@ import org.springframework.web.servlet.HandlerInterceptor;
 public class LoginInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
+    private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        log.info("요청 인터셉트: URI={}, Method={}", request.getRequestURI(), request.getMethod());
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
+        log.info("요청 인터셉트: URI={}, Method={}", uri, method);
 
         // 0. Options 처리
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            log.debug("OPTIONS 요청 - 인증 생략: URI={}", request.getRequestURI());
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            log.debug("OPTIONS 요청 - 인증 생략: URI={}", uri);
+            return true;
+        }
+
+        // 0-1.각 도메인별로 경로 예외처리
+        // 리뷰 도메인 경로 제외
+        if (isPublicGetForReview(request)) {
+            log.info("GET 요청 인증 제외 : URI={}, Method={}", uri, method);
+            return true;
+        }
+        // 비디오 도메인 경로 제외
+        if (isPublicGetForVideo(request)) {
+            log.info("GET 요청 인증 제외 : URI={}, Method={}", uri, method);
             return true;
         }
 
@@ -69,8 +85,29 @@ public class LoginInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
         UserContext.clear(); // 요청 끝나면 반드시 클리어. securityContextHolder가 유저의 정보를 없애버리는 것과 같은 맥락
         log.debug("UserContext 클리어 완료 - 요청 종료: URI={}", request.getRequestURI());
     }
+
+    private boolean isPublicGetForReview(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+        String method = req.getMethod();
+
+        return "GET".equalsIgnoreCase(method) && (
+                antPathMatcher.match("/api/reviews", uri)
+                        || antPathMatcher.match("/api/reviews/*", uri)
+        );
+    }
+
+    private boolean isPublicGetForVideo(HttpServletRequest req) {
+        String uri = req.getRequestURI();
+        String method = req.getMethod();
+
+        return "GET".equalsIgnoreCase(method) && (
+                antPathMatcher.match("/api/videos/*", uri)
+                        || antPathMatcher.match("/api/videos/search", uri)
+        );
+    }
+
 }
