@@ -14,11 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-
-/**
- * 사용자가 요청을 넣을때, webconfig에서 열어놓지 않은 api로 요청을 넣을때 인터셉터가
- * 실행된다.
- */
 @Slf4j(topic = "LoginInterceptor - JWT 토큰 로그인 검증")
 @RequiredArgsConstructor
 @Component
@@ -31,7 +26,6 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         String uri = request.getRequestURI();
         String method = request.getMethod();
-        log.info("요청 인터셉트: URI={}, Method={}", uri, method);
 
         // 0. Options 처리
         if ("OPTIONS".equalsIgnoreCase(method)) {
@@ -61,6 +55,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             return true;
         }
 
+        log.info("요청 인터셉트: URI={}, Method={}", uri, method);
         // 1. 쿠키에서 토큰 까보기
         String tokenValue = jwtUtil.getTokenFromRequest(request);
         if (tokenValue == null) {
@@ -96,7 +91,7 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     @Override
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-        UserContext.clear(); // 요청 끝나면 반드시 클리어. securityContextHolder가 유저의 정보를 없애버리는 것과 같은 맥락
+        UserContext.clear(); // 요청 끝나면 반드시 클리어. securityContextHolder 유저의 정보를 없애버리는 것과 같은 맥락
         log.debug("UserContext 클리어 완료 - 요청 종료: URI={}", request.getRequestURI());
     }
 
