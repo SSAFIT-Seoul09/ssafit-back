@@ -30,6 +30,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40010, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, 4011, "지원되지 않는 JWT 토큰입니다."),
     INVALID_JWT_CLAIMS(HttpStatus.BAD_REQUEST, 4012, "잘못된 JWT 토큰입니다."),
+    BLACKLISTED_TOKEN(HttpStatus.BAD_REQUEST, 4013, "블랙리스트된 토큰입니다."),
 
     // 4010번대: 리소스 관련 오류
     VIDEO_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 4000, "해당 영상에 대한 권한이 없습니다."),
