@@ -29,6 +29,12 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
         log.info("요청 인터셉트: URI={}, Method={}", request.getRequestURI(), request.getMethod());
 
+        // 0. Options 처리
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            log.debug("OPTIONS 요청 - 인증 생략: URI={}", request.getRequestURI());
+            return true;
+        }
+
         // 1. 쿠키에서 토큰 까보기
         String tokenValue = jwtUtil.getTokenFromRequest(request);
         if (tokenValue == null) {
