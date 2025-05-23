@@ -17,6 +17,7 @@ public class Review extends TimeStamped {
     private String title;
     private String content;
     private int rating;
+    private int views;
 
     public static Review of(Long userId, Long videoId, ReviewRequestDto requestDto) {
         return Review.builder()

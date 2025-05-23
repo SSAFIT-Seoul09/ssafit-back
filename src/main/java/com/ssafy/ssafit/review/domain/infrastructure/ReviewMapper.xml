@@ -57,4 +57,10 @@
         WHERE id = #{id}
     </delete>
 
+    <update id="increaseViewCnt" parameterType="long">
+        UPDATE reviews
+        SET views = views + 1
+        WHERE id = #{reviewId}
+    </update>
+
 </mapper>

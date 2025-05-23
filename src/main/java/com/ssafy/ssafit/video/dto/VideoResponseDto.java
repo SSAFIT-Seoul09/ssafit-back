@@ -17,6 +17,7 @@ public class VideoResponseDto {
     private String description;
     private String part;
     private String url;
+    private int views;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 
@@ -27,6 +28,7 @@ public class VideoResponseDto {
                 .description(video.getDescription())
                 .part(video.getPart().getValue())
                 .url(video.getUrl())
+                .views(video.getViews())
                 .createdAt(video.getCreatedAt())
                 .modifiedAt(video.getModifiedAt())
                 .build();

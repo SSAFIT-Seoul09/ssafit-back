@@ -38,19 +38,9 @@ public class UserController {
     }
     // 로그인
     @PostMapping("/signin")
-    public ResponseEntity<ApiResponse<UserSignInResponseDto>> login(@RequestBody UserSignInRequestDto requestDto, HttpServletResponse res, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<UserSignInResponseDto>> login(@RequestBody UserSignInRequestDto requestDto, HttpServletResponse res) {
         log.info("로그인 요청: {}", requestDto.getEmail());
         UserSignInResponseDto responseDto = userService.login(requestDto, res);
-        Cookie[] cookies = req.getCookies();
-        if(cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals("Authorization")) {
-                    log.debug("JWT 쿠키 발견: {}", cookie.getName());
-                    log.info("쿠키 헤더 토큰 확인해보기 : {}", URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8));
-                }
-            }
-        }
-        log.info("응답객체 토큰: {}", responseDto.getToken());
         return ResponseEntity.ok(ApiResponse.success("로그인에 성공하였습니다.", responseDto));
     }
 

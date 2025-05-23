@@ -4,7 +4,6 @@ import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.global.util.exception.CookieException;
 import com.ssafy.ssafit.global.util.exception.TokenException;
 import com.ssafy.ssafit.user.domain.model.UserRole;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -22,7 +21,10 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.*;
+import java.util.Base64;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j(topic = "JwtUtil") // Logger를 가져오는 어노테이션
 @Component
@@ -138,17 +140,16 @@ public class JwtUtil {
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
     public String getTokenFromRequest(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
-        log.info("쿠키 개봉 : {}", Arrays.stream(cookies).toList());
         if(cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals(AUTHORIZATION_HEADER)) {
-                    log.debug("JWT 쿠키 발견: {}", cookie.getName());
+                    log.debug("JWT 쿠키 발견: {}, {}", cookie.getName(), cookie.getValue());
                     return URLDecoder.decode(cookie.getValue(), StandardCharsets.UTF_8); // Encode 되어 넘어간 Value 다시 Decode
                 }
             }
         }
-        log.warn("JWT 쿠키를 찾을 수 없음");
-        throw CookieException.of(ErrorCode.COOKIE_NOT_FOUND);
+        log.warn("JWT 토큰를 찾을 수 없음");
+        throw CookieException.of(ErrorCode.TOKEN_NOT_FOUND);
     }
 
     // 토큰 블랙리스트 여부 확인

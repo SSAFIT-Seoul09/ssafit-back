@@ -14,11 +14,13 @@ public interface ReviewDao {
 
     List<ReviewResponseDto> getAllReviews();
 
-    List<ReviewResponseDto> getReviewByVideoId(Long videoId);
+    List<ReviewResponseDto> getReviewByVideoId(@Param("videoId")Long videoId);
 
     List<ReviewResponseDto> getReviewByVideoIdAndReviewId(@Param("videoId") Long videoId, @Param("reviewId") Long reviewId);
 
     int updateReview(Review updateReview);
 
-    int deleteById(Long id);
+    int deleteById(@Param("id") Long id);
+
+    void increaseViewCnt(@Param("reviewId") Long reviewId);
 }

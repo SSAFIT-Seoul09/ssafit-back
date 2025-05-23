@@ -17,6 +17,7 @@ public class  Video extends TimeStamped {
     private String description;
     private VideoPart part;
     private String url;
+    private int views;
 
     public static Video from(Long userId, VideoRequestDto requestDto) {
         return Video.builder()
@@ -25,6 +26,7 @@ public class  Video extends TimeStamped {
                 .description(requestDto.getDescription())
                 .part(VideoPart.valueOf(requestDto.getPart()))
                 .url(requestDto.getUrl())
+                .views(0)
                 .build();
     }
 

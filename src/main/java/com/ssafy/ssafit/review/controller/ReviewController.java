@@ -21,6 +21,7 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
+    // 리뷰작성
     @PostMapping("{videoId}")
     public ResponseEntity<ApiResponse<ReviewResponseDto>> createReview(@LoginUser AuthenticatedUser authenticatedUser,
                                                                        @PathVariable(name = "videoId") Long videoId,
@@ -36,8 +37,7 @@ public class ReviewController {
         return ResponseEntity.ok(ApiResponse.success("리뷰 전체 목록을 조회하였습니다.", list));
     }
 
-    // 리뷰작성
-    // 특정 비디오 리뷰 조회. reviewId 입력시
+    // 특정 비디오의 리뷰 조회. reviewId 입력시 상세조회
     @GetMapping("/{videoId}")
     public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getReviews(@PathVariable(name = "videoId", required = false) Long videoId,
                                                                            @RequestParam(name = "reviewId", required = false) Long reviewId) {

@@ -21,4 +21,6 @@ public interface VideoDao {
     // 영상 삭제
     int deleteVideo(Long id);
 
+    // 조회수 증가
+    void increaseViewCnt(Long videoId);
 }

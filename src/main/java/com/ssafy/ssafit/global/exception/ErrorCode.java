@@ -30,6 +30,7 @@ public enum ErrorCode {
     EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, 40010, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, 4011, "지원되지 않는 JWT 토큰입니다."),
     INVALID_JWT_CLAIMS(HttpStatus.BAD_REQUEST, 4012, "잘못된 JWT 토큰입니다."),
+    BLACKLISTED_TOKEN(HttpStatus.BAD_REQUEST, 4013, "블랙리스트된 토큰입니다."),
 
     // 4010번대: 리소스 관련 오류
     VIDEO_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 4000, "해당 영상에 대한 권한이 없습니다."),
@@ -54,7 +55,6 @@ public enum ErrorCode {
     // 찜 관련 에러 코드
     FAVORITE_VIDEO_NOT_FOUND(HttpStatus.NOT_FOUND, 4602, "찜한 영상을 찾을 수 없습니다."),
     // 5000번대: 서버 오류
-    COOKIE_NOT_FOUND(HttpStatus.INTERNAL_SERVER_ERROR, 5001, "쿠키를 찾을 수 없습니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 5000, "서버 오류가 발생했습니다.");
 
     private final HttpStatus status;

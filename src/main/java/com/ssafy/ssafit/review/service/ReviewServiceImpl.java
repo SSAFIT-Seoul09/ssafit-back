@@ -58,6 +58,7 @@ public class ReviewServiceImpl implements ReviewService {
         return list;
     }
 
+    @Transactional
     @Override
     public List<ReviewResponseDto> getReview(Long videoId, Long reviewId) {
         log.info("특정 리뷰 조회 요청: videoId={}, reviewId={}", videoId, reviewId);
@@ -127,6 +128,7 @@ public class ReviewServiceImpl implements ReviewService {
         if (reviewId == null) {
             return reviewDao.getReviewByVideoId(videoId);
         } else {
+            reviewDao.increaseViewCnt(reviewId);
             return reviewDao.getReviewByVideoIdAndReviewId(videoId, reviewId);
         }
     }
