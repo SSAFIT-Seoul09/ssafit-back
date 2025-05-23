@@ -33,11 +33,11 @@ public class VideoController {
     }
 
     // 영상 전체 조회 + 조건 검색 통합
-    @GetMapping
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<VideoResponseDto>>> searchVideos(
-            @RequestParam(required = false) String title,
-            @RequestParam(required = false) List<String> parts,
-            @RequestParam(required = false) Integer views) {
+            @RequestParam(name = "title", required = false) String title,
+            @RequestParam(name = "parts", required = false) List<String> parts,
+            @RequestParam(name = "views", required = false) Integer views) {
 
         log.info("영상 제목 : {}, 파트 : {}, 조회수 : {}",
                 title, parts, views);

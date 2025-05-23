@@ -1,6 +1,5 @@
 package com.ssafy.ssafit.user.service;
 
-import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.global.util.JwtUtil;
 import com.ssafy.ssafit.user.domain.model.User;
 import com.ssafy.ssafit.user.domain.repository.UserDao;

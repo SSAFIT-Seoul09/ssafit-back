@@ -5,7 +5,6 @@ import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
 import com.ssafy.ssafit.comment.exception.*;
-import com.ssafy.ssafit.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -5,7 +5,6 @@ import com.ssafy.ssafit.favorite.domain.repository.FavoriteDao;
 import com.ssafy.ssafit.favorite.dto.UserFavoriteDto;
 import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
 import com.ssafy.ssafit.favorite.exception.FavoriteNotFoundException;
-import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.exception.VideoNotFoundException;
