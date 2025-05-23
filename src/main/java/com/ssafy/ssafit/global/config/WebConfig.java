@@ -32,7 +32,8 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/api/users/signin", "/api/users/signup", "/css/**", "/js/**", "/images/**"); // 현재 로그인, 회원가입 요청을 제외하면 모든 요청에 jwt토큰 검증을 진행함.
+                .excludePathPatterns("/api/users/signin", "/api/users/signup", "/css/**", "/js/**", "/images/**") // 현재 로그인, 회원가입 요청을 제외하면 모든 요청에 jwt토큰 검증을 진행함.
+                .excludePathPatterns("/api/videos/search");  // 비디오 검색
     }
 
     // @LoginUser어노테이션 리졸버 등록
@@ -47,7 +48,8 @@ public class WebConfig implements WebMvcConfigurer {
                 .allowedOrigins(
                         "http://localhost:8080",
                         "http://localhost:8081",
-                        "http://localhost:5173"
+                        "http://localhost:5173",
+                        "http://localhost:5173/"
                 )
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
