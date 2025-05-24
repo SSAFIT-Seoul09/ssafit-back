@@ -24,7 +24,74 @@
     <select id="getReviewById" resultType="Review" parameterType="Long">
         SELECT *
         FROM reviews
+        WHERE id = #{reviewId}
+    </select>
+
+    <select id="getReviewResponseDtoByVideoId" resultType="ReviewResponseDto" parameterType="long">
+        SELECT
+            r.*,
+            u.nickname,
+            v.title AS video_title
+        FROM
+            reviews r
+                JOIN users u      ON r.user_id = u.id
+                JOIN videos v     ON r.video_id = v.id
+        WHERE video_id = #{videoId}
+    </select>
+
+    <select id="getReviewResponseDtoByVideoIdAndReviewId" resultType="ReviewResponseDto" parameterType="long">
+        SELECT
+            r.*,
+            u.nickname,
+            v.title AS video_title
+        FROM
+            reviews r
+                JOIN users u      ON r.user_id = u.id
+                JOIN videos v     ON r.video_id = v.id
+        WHERE r.video_id = #{videoId}
+          AND r.id = #{reviewId}
+    </select>
+
+    <update id="updateReview" parameterType="Review">
+        UPDATE reviews
+        SET title = #{title},
+            content = #{content},
+            rating = #{rating}
+        WHERE id = #{id} AND user_id = #{userId}
+    </update>
+
+    <delete id="deleteById" parameterType="long">
+        DELETE FROM reviews
         WHERE id = #{id}
+    </delete>
+
+    <update id="increaseViewCnt" parameterType="long">
+        UPDATE reviews
+        SET views = views + 1
+        WHERE id = #{reviewId}
+    </update>
+    
+    <select id="getReviewResponseDtoByReviewId" parameterType="long" resultType="ReviewResponseDto">
+        SELECT
+            r.*,
+            u.nickname,
+            v.title AS video_title
+        FROM
+            reviews r
+                JOIN users u      ON r.user_id = u.id
+                JOIN videos v     ON r.video_id = v.id
+        WHERE r.id = #{reviewId}
+    </select>
+
+    <select id="getAllReviewResponseDto" resultType="ReviewResponseDto">
+        SELECT
+            r.*,
+            u.nickname,
+            v.title AS video_title
+        FROM
+            reviews r
+                JOIN users u      ON r.user_id = u.id
+                JOIN videos v     ON r.video_id = v.id
     </select>
 
     <select id="getAllReviews" resultType="Review">
@@ -43,24 +110,5 @@
         FROM reviews
         WHERE id = #{reviewId}
     </select>
-
-    <update id="updateReview" parameterType="Review">
-        UPDATE reviews
-        SET title = #{title},
-        content = #{content},
-        rating = #{rating},
-        WHERE id = #{id} AND user_id = #{userId};
-    </update>
-
-    <delete id="deleteById" parameterType="long">
-        DELETE FROM reviews
-        WHERE id = #{id}
-    </delete>
-
-    <update id="increaseViewCnt" parameterType="long">
-        UPDATE reviews
-        SET views = views + 1
-        WHERE id = #{reviewId}
-    </update>
 
 </mapper>

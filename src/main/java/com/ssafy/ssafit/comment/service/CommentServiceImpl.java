@@ -5,8 +5,6 @@ import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
 import com.ssafy.ssafit.comment.exception.*;
-import com.ssafy.ssafit.review.domain.model.Review;
-import com.ssafy.ssafit.review.exception.ReviewAccessUnauthorizedException;
 import com.ssafy.ssafit.user.domain.model.User;
 import com.ssafy.ssafit.user.domain.repository.UserDao;
 import com.ssafy.ssafit.user.exception.UserNotFoundException;

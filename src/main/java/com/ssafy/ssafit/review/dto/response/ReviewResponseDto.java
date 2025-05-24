@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 @Getter
 public class ReviewResponseDto {
-    private Long reviewId;
+    private Long id;
     private Long userId;
     private Long videoId;
     private String title;
@@ -18,10 +18,12 @@ public class ReviewResponseDto {
     private int views;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private String nickname;
+    private String videoTitle;
 
     public static ReviewResponseDto toDto(Review insertedReview) {
         return ReviewResponseDto.builder()
-                .reviewId(insertedReview.getId())
+                .id(insertedReview.getId())
                 .userId(insertedReview.getUserId())
                 .videoId(insertedReview.getVideoId())
                 .title(insertedReview.getTitle())

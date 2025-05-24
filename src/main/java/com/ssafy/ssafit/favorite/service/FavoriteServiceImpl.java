@@ -2,8 +2,8 @@ package com.ssafy.ssafit.favorite.service;
 
 import com.ssafy.ssafit.favorite.domain.model.Favorite;
 import com.ssafy.ssafit.favorite.domain.repository.FavoriteDao;
-import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
+import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.exception.VideoNotFoundException;
