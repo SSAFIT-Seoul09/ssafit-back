@@ -4,7 +4,6 @@ import com.ssafy.ssafit.user.domain.model.User;
 import com.ssafy.ssafit.user.domain.repository.UserDao;
 import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import com.ssafy.ssafit.video.domain.model.Video;
-import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;

@@ -1,6 +1,6 @@
 package com.ssafy.ssafit.video.dto;
 
-import lombok.*;
+import lombok.Getter;
 
 @Getter
 public class VideoRequestDto {

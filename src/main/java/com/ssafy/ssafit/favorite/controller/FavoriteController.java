@@ -1,7 +1,7 @@
 package com.ssafy.ssafit.favorite.controller;
 
-import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
+import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import com.ssafy.ssafit.favorite.service.FavoriteService;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.annotation.LoginUser;
