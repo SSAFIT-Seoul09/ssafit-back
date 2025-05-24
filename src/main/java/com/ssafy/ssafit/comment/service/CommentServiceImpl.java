@@ -5,12 +5,19 @@ import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
 import com.ssafy.ssafit.comment.exception.*;
+import com.ssafy.ssafit.review.domain.model.Review;
+import com.ssafy.ssafit.review.exception.ReviewAccessUnauthorizedException;
+import com.ssafy.ssafit.user.domain.model.User;
+import com.ssafy.ssafit.user.domain.repository.UserDao;
+import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j(topic = "CommentServiceImpl")
 @Service
@@ -19,11 +26,14 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
+    private final UserDao userDao;
 
     @Transactional
     @Override
     public CommentResponseDto createComment(Long userId, Long reviewId, CommentRequestDto requestDto) {
         log.info("댓글 작성 요청: userId={}, reviewId={}, requestDto={}", userId, reviewId, requestDto);
+
+        isUserValid(userId);
 
         // 댓글 작성
         Comment comment = Comment.of(userId, reviewId, requestDto);
@@ -39,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
 
         // 조회
         Comment insertedComment = commentDao.findById(comment.getId());
-        if(insertedComment != null) {
+        if(insertedComment == null) {
             log.error("댓글 삽입 실패: commentId={}", comment.getId());
             throw CommentNotFoundException.of();
         }
@@ -53,10 +63,7 @@ public class CommentServiceImpl implements CommentService {
     public List<CommentResponseDto> getComments(Long reviewId) {
         log.info("리뷰에 대한 댓글 조회 요청: reviewId={}", reviewId);
         List<CommentResponseDto> list = commentDao.findByReviewId(reviewId);
-        if (list.isEmpty()) {
-            log.error("댓글 없음: reviewId={}", reviewId);
-            throw CommentNotFoundException.of();
-        }
+
         log.info("댓글 조회 성공: reviewId={}, 댓글 수={}", reviewId, list.size());
         return list;
     }
@@ -66,15 +73,9 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponseDto update(Long userId, Long commentId, CommentRequestDto requestDto) {
         log.info("댓글 수정 요청: userId={}, commentId={}, requestDto={}", userId, commentId, requestDto);
 
+        Comment comment = commentDao.findById(commentId);
 
-        // 댓글 존재 여부 확인
-        Comment comment = getComment(commentId);
-
-        // 작성자와 수정하려는 사람이 같은지 확인.
-        if(comment.getUserId() != userId) {
-            log.error("수정 권한 없음: userId={}는 commentId={}의 수정 권한이 없습니다.", userId, commentId);
-            throw CommentAccessUnauthorizedException.of(commentId);
-        }
+        isWrittenByUserId(userId, commentId, comment);
 
         comment.update(requestDto);
         log.debug("댓글 수정 내용: {}", comment);
@@ -94,15 +95,11 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long userId, Long commentId) {
         log.info("댓글 삭제 요청: userId={}, commentId={}", userId, commentId);
 
+        isUserValid(userId);
 
-        // 댓글 존재 유무 확인
-        Comment comment = getComment(commentId);
+        Comment comment = commentDao.findById(commentId);
 
-        // 본인 댓글인지 확인
-        if(comment.getUserId() != userId) {
-            log.error("삭제 권한 없음: userId={}는 commentId={}의 삭제 권한이 없습니다.", userId, commentId);
-            throw CommentAccessUnauthorizedException.of(commentId);
-        }
+        isWrittenByUserId(userId, commentId, comment);
 
         // 댓글 삭제 성공 여부
         int isDeleted = commentDao.deleteById(commentId);
@@ -113,12 +110,23 @@ public class CommentServiceImpl implements CommentService {
         log.info("댓글 삭제 성공: commentId={}", commentId);
     }
 
-    private Comment getComment(Long commentId) {
-        Comment comment = commentDao.findById(commentId);
-        if (comment == null) {
-            log.error("댓글 없음: commentId={}", commentId);
-            throw CommentNotFoundException.of();
-        }
-        return comment;
+
+    // 존재하는 회원의 요청인지 확인
+    private boolean isUserValid(Long userId) {
+        User user = Optional.ofNullable(userDao.findUserById(userId))
+                .orElseThrow(() -> {
+                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
+                    throw UserNotFoundException.ofUserId(userId);
+                });
+        return user != null;
     }
+
+    // 요청자가 작성한 글인지 확인
+    private static void isWrittenByUserId(Long userId, Long commentId, Comment comment) {
+        if(!Objects.equals(comment.getUserId(), userId)) {
+            log.error("수정 권한 없음: userId={}는 commentId={}의 수정 권한이 없습니다.", userId, commentId);
+            throw CommentAccessUnauthorizedException.of(commentId);
+        }
+    }
+
 }
