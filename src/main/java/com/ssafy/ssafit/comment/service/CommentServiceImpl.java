@@ -108,6 +108,13 @@ public class CommentServiceImpl implements CommentService {
         log.info("댓글 삭제 성공: commentId={}", commentId);
     }
 
+    @Override
+    public List<CommentResponseDto> getMyCommentList(Long userId) {
+        List<CommentResponseDto> list = commentDao.getCommentResponseDtoByUserId(userId);
+        log.info("회원이 작성한 댓글 개수 : {}", list.size());
+        return list;
+    }
+
 
     // 존재하는 회원의 요청인지 확인
     private boolean isUserValid(Long userId) {

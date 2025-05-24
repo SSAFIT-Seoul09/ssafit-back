@@ -18,5 +18,7 @@ public interface CommentDao {
 
     int updateComment(Comment comment);
 
-    int deleteById(Long commentId);
+    int deleteById(@Param("commentId") Long commentId);
+
+    List<CommentResponseDto> getCommentResponseDtoByUserId(@Param("userId") Long userId);
 }

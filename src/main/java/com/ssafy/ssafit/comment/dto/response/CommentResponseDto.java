@@ -1,6 +1,5 @@
 package com.ssafy.ssafit.comment.dto.response;
 
-import com.ssafy.ssafit.comment.domain.model.Comment;
 import lombok.Builder;
 import lombok.Getter;
 

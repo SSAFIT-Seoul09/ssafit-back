@@ -14,4 +14,6 @@ public interface CommentService {
     CommentResponseDto update(Long userId, Long commentId, CommentRequestDto requestDto);
 
     void deleteComment(Long userId, Long commentId);
+
+    List<CommentResponseDto> getMyCommentList(Long userId);
 }

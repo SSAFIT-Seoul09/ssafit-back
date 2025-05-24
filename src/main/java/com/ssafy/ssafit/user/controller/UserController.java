@@ -1,6 +1,7 @@
 package com.ssafy.ssafit.user.controller;
 
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
+import com.ssafy.ssafit.comment.service.CommentService;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.annotation.LoginUser;
 import com.ssafy.ssafit.global.response.ApiResponse;
@@ -34,6 +35,7 @@ public class UserController {
     private final UserService userService;
     private final VideoService videoService;
     private final ReviewService reviewService;
+    private final CommentService commentService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -106,5 +108,13 @@ public class UserController {
         log.info("회원 등록 리뷰 조회 - 회원ID: {}", authenticatedUser.getUserId());
         List<ReviewResponseDto> list = reviewService.getMyReviewList(authenticatedUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("회원이 등록한 영상 조회 성공", list));
+    }
+
+    // 작성한 댓글 전체 조회
+    @GetMapping("/info/comments")
+    public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getMyComments(@LoginUser AuthenticatedUser authenticatedUser) {
+        log.info("회원 등록 댓글 조회 - 회원ID: {}", authenticatedUser.getUserId());
+        List<CommentResponseDto> list = commentService.getMyCommentList(authenticatedUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("회원이 등록한 댓글 조회 성공", list));
     }
 }
