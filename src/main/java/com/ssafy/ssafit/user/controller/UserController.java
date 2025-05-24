@@ -1,8 +1,11 @@
 package com.ssafy.ssafit.user.controller;
 
+import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
 import com.ssafy.ssafit.global.auth.annotation.LoginUser;
 import com.ssafy.ssafit.global.response.ApiResponse;
+import com.ssafy.ssafit.review.dto.response.ReviewResponseDto;
+import com.ssafy.ssafit.review.service.ReviewService;
 import com.ssafy.ssafit.user.dto.request.UpdateUserDetailRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignInRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignUpRequestDto;
@@ -30,6 +33,7 @@ public class UserController {
 
     private final UserService userService;
     private final VideoService videoService;
+    private final ReviewService reviewService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -38,6 +42,7 @@ public class UserController {
         UserSignUpResponseDto responseDto = userService.signup(requestDto);
         return ResponseEntity.ok(ApiResponse.success("회원가입에 성공하였습니다.", responseDto));
     }
+
     // 로그인
     @PostMapping("/signin")
     public ResponseEntity<ApiResponse<UserSignInResponseDto>> login(@RequestBody UserSignInRequestDto requestDto, HttpServletResponse res) {
@@ -96,8 +101,10 @@ public class UserController {
     }
 
     // 작성한 리뷰 전체 조회
-
-    // 작성한 댓글 전체 조회
-
-
+    @GetMapping("/info/reviews")
+    public ResponseEntity<ApiResponse<List<ReviewResponseDto>>> getMyReviews(@LoginUser AuthenticatedUser authenticatedUser) {
+        log.info("회원 등록 리뷰 조회 - 회원ID: {}", authenticatedUser.getUserId());
+        List<ReviewResponseDto> list = reviewService.getMyReviewList(authenticatedUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("회원이 등록한 영상 조회 성공", list));
+    }
 }

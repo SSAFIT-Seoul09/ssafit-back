@@ -111,4 +111,16 @@
         WHERE id = #{reviewId}
     </select>
 
+    <select id="getReviewResponseDtoByUserId" parameterType="long" resultType="ReviewResponseDto">
+        SELECT
+            r.*,
+            u.nickname,
+            v.title AS video_title
+        FROM
+            reviews r
+                JOIN users u      ON r.user_id = u.id
+                JOIN videos v     ON r.video_id = v.id
+        WHERE r.user_id = #{userId}
+    </select>
+
 </mapper>

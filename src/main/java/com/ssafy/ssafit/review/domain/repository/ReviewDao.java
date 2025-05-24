@@ -25,4 +25,6 @@ public interface ReviewDao {
     ReviewResponseDto getReviewResponseDtoByReviewId(@Param("reviewId") Long reviewId);
 
     List<ReviewResponseDto> getAllReviewResponseDto();
+
+    List<ReviewResponseDto> getReviewResponseDtoByUserId(@Param("userId") Long userId);
 }

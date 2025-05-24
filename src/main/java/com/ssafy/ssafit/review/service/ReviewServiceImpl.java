@@ -121,6 +121,13 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
     }
 
+    @Override
+    public List<ReviewResponseDto> getMyReviewList(Long userId) {
+        List<ReviewResponseDto> list = reviewDao.getReviewResponseDtoByUserId(userId);
+        log.info("회원이 작성한 리뷰 개수 : {} ", list.size());
+        return list;
+    }
+
     private List<ReviewResponseDto> getReviewsByCondition(Long videoId, Long reviewId) {
         if (reviewId == null) {
             return reviewDao.getReviewResponseDtoByVideoId(videoId);
