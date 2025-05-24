@@ -1,20 +1,21 @@
 package com.ssafy.ssafit.video.service;
 
+import com.ssafy.ssafit.user.domain.model.User;
+import com.ssafy.ssafit.user.domain.repository.UserDao;
+import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.model.VideoPart;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import com.ssafy.ssafit.video.dto.VideoResponseDto;
-import com.ssafy.ssafit.video.exception.VideoDeleteException;
-import com.ssafy.ssafit.video.exception.VideoInsertException;
-import com.ssafy.ssafit.video.exception.VideoNotFoundException;
-import com.ssafy.ssafit.video.exception.VideoUpdatedException;
+import com.ssafy.ssafit.video.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j(topic = "videoServiceImpl")
@@ -24,12 +25,16 @@ import java.util.Optional;
 public class VideoServiceImpl implements VideoService {
 
     private final VideoDao videoDao;
+    private final UserDao userDao;
 
     // 영상 등록
     @Transactional
     @Override
     public VideoResponseDto insertVideo(Long userId, VideoRequestDto requestDto) {
         log.info("영상 등록 시작: userId={}, videoRequestDto={}", userId, requestDto);
+
+        // 해당 회원의 존재 여부
+        isUserValid(userId);
 
         Video video = Video.from(userId, requestDto);
         int inserted = videoDao.insertVideo(video);
@@ -82,25 +87,20 @@ public class VideoServiceImpl implements VideoService {
     public VideoResponseDto updateVideo(Long userId, Long videoId, VideoRequestDto requestDto) {
         log.info("영상 수정 시작: videoId={}, userId={}, requestDto={}", videoId, userId, requestDto);
 
+        isUserValid(userId);
+
         Video video = getVideo(videoId);
 
-        // TODO : 본인이 등록한 비디오인지 확인하는 작업. VideoAccessForbiddentException 클래스를 만들어서 사용하자.
+        isWrittenByUserId(userId, videoId, video);
 
-
-        // TODO : 영상 수정 빌더 패턴 적용
         // 영상 정보 수정
-        video.setUserId(userId);
-        video.setTitle(requestDto.getTitle());
-        video.setDescription(requestDto.getDescription());
-        video.setPart(VideoPart.from(requestDto.getPart()));
-        video.setUrl(requestDto.getUrl());
+        video.update(requestDto);
 
         int isUpdated = videoDao.updateVideo(video);
         if (isUpdated <= 0) {
             log.error("영상 등록 실패: videoId={}, videoRequestDto={}", videoId, requestDto);
             throw VideoUpdatedException.of(videoId);
         }
-
 
         log.info("영상 수정 완료: videoId={}", videoId);
 
@@ -116,7 +116,11 @@ public class VideoServiceImpl implements VideoService {
     public void deleteVideo(Long userId, Long videoId) {
         log.info("영상 삭제 시작: videoId={}, userId={}", videoId, userId);
 
+        isUserValid(userId);
+
         Video video = getVideo(videoId);
+
+        isWrittenByUserId(userId, videoId, video);
 
         int isDeleted = videoDao.deleteVideo(video.getId());
         if (isDeleted <= 0) {
@@ -133,5 +137,23 @@ public class VideoServiceImpl implements VideoService {
                     throw VideoNotFoundException.of(videoId);
                 });
         return video;
+    }
+
+    // 존재하는 회원의 요청인지 확인
+    private boolean isUserValid(Long userId) {
+        User user = Optional.ofNullable(userDao.findUserById(userId))
+                .orElseThrow(() -> {
+                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
+                    throw UserNotFoundException.ofUserId(userId);
+                });
+        return user != null;
+    }
+
+    // 요청자가 작성한 글인지 확인
+    private void isWrittenByUserId(Long userId, Long videoId, Video video) {
+        if (!Objects.equals(video.getUserId(), userId)) {
+            log.info("본인 글이 아닙니다. 작성자Id : {} 수정요청Id : {}", videoId, userId);
+            throw VideoAccessUnauthorizedException.of(video.getUserId(), userId);
+        }
     }
 }
