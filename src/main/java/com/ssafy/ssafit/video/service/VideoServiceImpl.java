@@ -93,10 +93,7 @@ public class VideoServiceImpl implements VideoService {
         Video video = getVideo(videoId);
 
         // 본인 글인지 확인
-        if (!Objects.equals(video.getUserId(), userId)) {
-            log.info("본인 글이 아닙니다. 작성자Id : {} 수정요청Id : {}", videoId, userId);
-            throw VideoAccessUnauthorizedException.of(video.getUserId(), userId);
-        }
+        isWrittenByUserId(userId, videoId, video);
 
         // 영상 정보 수정
         video.update(requestDto);
@@ -121,7 +118,13 @@ public class VideoServiceImpl implements VideoService {
     public void deleteVideo(Long userId, Long videoId) {
         log.info("영상 삭제 시작: videoId={}, userId={}", videoId, userId);
 
+        // 해당 회원의 존재 여부
+        isUserValid(userId);
+
         Video video = getVideo(videoId);
+
+        // 본인 글인지 확인
+        isWrittenByUserId(userId, videoId, video);
 
         int isDeleted = videoDao.deleteVideo(video.getId());
         if (isDeleted <= 0) {
@@ -147,5 +150,12 @@ public class VideoServiceImpl implements VideoService {
                     throw UserNotFoundException.ofUserId(userId);
                 });
         return user != null;
+    }
+
+    private static void isWrittenByUserId(Long userId, Long videoId, Video video) {
+        if (!Objects.equals(video.getUserId(), userId)) {
+            log.info("본인 글이 아닙니다. 작성자Id : {} 수정요청Id : {}", videoId, userId);
+            throw VideoAccessUnauthorizedException.of(video.getUserId(), userId);
+        }
     }
 }
