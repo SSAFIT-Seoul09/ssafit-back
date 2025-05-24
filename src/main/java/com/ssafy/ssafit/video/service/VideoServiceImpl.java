@@ -87,12 +87,10 @@ public class VideoServiceImpl implements VideoService {
     public VideoResponseDto updateVideo(Long userId, Long videoId, VideoRequestDto requestDto) {
         log.info("영상 수정 시작: videoId={}, userId={}, requestDto={}", videoId, userId, requestDto);
 
-        // 해당 회원의 존재 여부
         isUserValid(userId);
 
         Video video = getVideo(videoId);
 
-        // 본인 글인지 확인
         isWrittenByUserId(userId, videoId, video);
 
         // 영상 정보 수정
@@ -118,12 +116,10 @@ public class VideoServiceImpl implements VideoService {
     public void deleteVideo(Long userId, Long videoId) {
         log.info("영상 삭제 시작: videoId={}, userId={}", videoId, userId);
 
-        // 해당 회원의 존재 여부
         isUserValid(userId);
 
         Video video = getVideo(videoId);
 
-        // 본인 글인지 확인
         isWrittenByUserId(userId, videoId, video);
 
         int isDeleted = videoDao.deleteVideo(video.getId());
@@ -143,6 +139,7 @@ public class VideoServiceImpl implements VideoService {
         return video;
     }
 
+    // 존재하는 회원의 요청인지 확인
     private boolean isUserValid(Long userId) {
         User user = Optional.ofNullable(userDao.findUserById(userId))
                 .orElseThrow(() -> {
@@ -152,7 +149,8 @@ public class VideoServiceImpl implements VideoService {
         return user != null;
     }
 
-    private static void isWrittenByUserId(Long userId, Long videoId, Video video) {
+    // 요청자가 작성한 글인지 확인
+    private void isWrittenByUserId(Long userId, Long videoId, Video video) {
         if (!Objects.equals(video.getUserId(), userId)) {
             log.info("본인 글이 아닙니다. 작성자Id : {} 수정요청Id : {}", videoId, userId);
             throw VideoAccessUnauthorizedException.of(video.getUserId(), userId);
