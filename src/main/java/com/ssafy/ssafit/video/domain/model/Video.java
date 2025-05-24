@@ -5,7 +5,6 @@ import com.ssafy.ssafit.video.dto.VideoRequestDto;
 import lombok.*;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -37,5 +36,13 @@ public class  Video extends TimeStamped {
                 .part(VideoPart.valueOf(requestDto.getPart()))
                 .url(requestDto.getUrl())
                 .build();
+    }
+
+    public void update(VideoRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.description = requestDto.getDescription();
+        this.part = VideoPart.valueOf(requestDto.getPart());
+        this.url = requestDto.getUrl();
+        this.views = 0;
     }
 }
