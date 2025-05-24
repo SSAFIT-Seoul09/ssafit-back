@@ -33,9 +33,7 @@ public class CommentServiceImpl implements CommentService {
 
         isUserValid(userId);
 
-        // 댓글 작성
         Comment comment = Comment.of(userId, reviewId, requestDto);
-        log.debug("댓글 객체 생성: {}", comment);
 
         // 디비 저장
         int isInserted = commentDao.insertComment(comment);
@@ -45,22 +43,20 @@ public class CommentServiceImpl implements CommentService {
         }
         log.info("댓글 DB 저장 완료: commentId={}", comment.getId());
 
-        // 조회
-        Comment insertedComment = commentDao.findById(comment.getId());
-        if(insertedComment == null) {
-            log.error("댓글 삽입 실패: commentId={}", comment.getId());
+        CommentResponseDto responseDto = commentDao.getCommentResponseDtoByCommentId(comment.getId());
+        if (responseDto == null) {
+            log.error("댓글 삽입 실패: commentId={}", responseDto.getId());
             throw CommentNotFoundException.of();
         }
 
-        log.info("댓글 작성 성공: commentId={}", insertedComment.getId());
-        // 반환
-        return CommentResponseDto.toDto(insertedComment);
+        log.info("댓글 작성 성공: commentId={}", responseDto.getId());
+        return responseDto;
     }
 
     @Override
     public List<CommentResponseDto> getComments(Long reviewId) {
         log.info("리뷰에 대한 댓글 조회 요청: reviewId={}", reviewId);
-        List<CommentResponseDto> list = commentDao.findByReviewId(reviewId);
+        List<CommentResponseDto> list = commentDao.getCommentResponseDtoByReviewId(reviewId);
 
         log.info("댓글 조회 성공: reviewId={}, 댓글 수={}", reviewId, list.size());
         return list;
@@ -70,6 +66,8 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponseDto update(Long userId, Long commentId, CommentRequestDto requestDto) {
         log.info("댓글 수정 요청: userId={}, commentId={}, requestDto={}", userId, commentId, requestDto);
+
+        isUserValid(userId);
 
         Comment comment = commentDao.findById(commentId);
 
@@ -84,8 +82,10 @@ public class CommentServiceImpl implements CommentService {
             throw CommentUpdateException.of(commentId);
         }
 
-        log.info("댓글 수정 성공: commentId={}", commentId);
-        return CommentResponseDto.toDto(comment);
+        CommentResponseDto responseDto = commentDao.getCommentResponseDtoByCommentId(commentId);
+
+        log.info("댓글 수정 성공: commentId={}", responseDto.getId());
+        return responseDto;
     }
 
     @Transactional
@@ -126,5 +126,4 @@ public class CommentServiceImpl implements CommentService {
             throw CommentAccessUnauthorizedException.of(commentId);
         }
     }
-
 }

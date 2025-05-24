@@ -10,9 +10,11 @@ public interface CommentDao {
 
     int insertComment(Comment comment);
 
-    Comment findById(Long id);
+    CommentResponseDto getCommentResponseDtoByCommentId(@Param("commentId") Long commentId);
 
-    List<CommentResponseDto> findByReviewId(@Param("reviewId") Long reviewId);
+    List<CommentResponseDto> getCommentResponseDtoByReviewId(@Param("reviewId") Long reviewId);
+
+    Comment findById(Long id);
 
     int updateComment(Comment comment);
 

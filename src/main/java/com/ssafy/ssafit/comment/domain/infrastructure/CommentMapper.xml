@@ -16,6 +16,16 @@
             ,#{content}
         )
     </insert>
+    
+    <select id="getCommentResponseDtoByCommentId" parameterType="long" resultType="CommentResponseDto">
+        SELECT
+            c.*,
+            u.nickname
+        FROM
+            comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.id = #{commentId}
+    </select>
 
     <select id="findById" parameterType="long">
         SELECT *
@@ -23,16 +33,21 @@
         WHERE id = #{id}
     </select>
 
-    <select id="findByReviewId" resultType="Comment" parameterType="long">
-        SELECT *
-        FROM comments
-        WHERE review_id = #{reviewId}
+    <select id="getCommentResponseDtoByReviewId" parameterType="long" resultType="CommentResponseDto">
+        SELECT
+            c.*,
+            u.nickname
+        FROM
+            comments c
+                JOIN users u ON c.user_id = u.id
+        WHERE c.review_id = #{reviewId}
     </select>
 
     <update id="updateComment" parameterType="Comment">
         UPDATE comments
         SET
         content = #{content}
+        WHERE id = #{id}
     </update>
 
     <delete id="deleteById" parameterType="long">

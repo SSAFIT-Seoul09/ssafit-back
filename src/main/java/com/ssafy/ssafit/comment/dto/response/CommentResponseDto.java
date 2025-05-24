@@ -10,21 +10,11 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentResponseDto {
 
-    private Long commentId;
+    private Long id;
     private Long userId;
     private Long reviewId;
     private String content;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
-
-    public static CommentResponseDto toDto(Comment insertedComment) {
-        return CommentResponseDto.builder()
-                .commentId(insertedComment.getId())
-                .userId(insertedComment.getUserId())
-                .reviewId(insertedComment.getReviewId())
-                .content(insertedComment.getContent())
-                .createdAt(insertedComment.getCreatedAt())
-                .modifiedAt(insertedComment.getModifiedAt())
-                .build();
-    }
+    private String nickname;
 }
