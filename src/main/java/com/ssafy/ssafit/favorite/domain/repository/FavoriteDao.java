@@ -1,7 +1,7 @@
 package com.ssafy.ssafit.favorite.domain.repository;
 
 import com.ssafy.ssafit.favorite.domain.model.Favorite;
-import com.ssafy.ssafit.favorite.dto.UserFavoriteDto;
+import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -17,5 +17,5 @@ public interface FavoriteDao {
     // 찜 제거
     void removeFavorite(Favorite favorite);
 
-    List<UserFavoriteDto> getAllById(@Param("userId") Long userId);
+    List<UserFavoriteResponseDto> getAllById(@Param("userId") Long userId);
 }

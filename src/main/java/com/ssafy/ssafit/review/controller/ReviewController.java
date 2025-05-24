@@ -16,13 +16,13 @@ import java.util.List;
 @Slf4j(topic = "ReviewController")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/reviews")
+@RequestMapping("/api/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
 
     // 리뷰작성
-    @PostMapping("{videoId}")
+    @PostMapping("/{videoId}")
     public ResponseEntity<ApiResponse<ReviewResponseDto>> createReview(@LoginUser AuthenticatedUser authenticatedUser,
                                                                        @PathVariable(name = "videoId") Long videoId,
                                                                        @RequestBody ReviewRequestDto requestDto) {

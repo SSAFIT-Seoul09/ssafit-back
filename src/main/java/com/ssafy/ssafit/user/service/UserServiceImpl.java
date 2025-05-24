@@ -7,6 +7,7 @@ import com.ssafy.ssafit.user.dto.request.UpdateUserDetailRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignInRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignUpRequestDto;
 import com.ssafy.ssafit.user.dto.response.UserDetailResponseDTO;
+import com.ssafy.ssafit.user.dto.response.UserPostCntResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignInResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignUpResponseDto;
 import com.ssafy.ssafit.user.exception.*;
@@ -112,10 +113,7 @@ public class UserServiceImpl implements UserService {
 
         // 등록된 회원인지 확인
         User checkUser = userDao.findUserById(userId);
-        if (checkUser == null) {
-            log.warn("회원 정보 수정 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.ofUserId(userId);
-        }
+        isRegisteredUser(userId, checkUser);
 
         User user = User.from(userId, requestDto);
         if (user.getPassword() != null) {
@@ -147,6 +145,21 @@ public class UserServiceImpl implements UserService {
         log.info("회원 탈퇴 성공: userId={}", userId);
     }
 
+    // 게시글 개수 조회
+    @Override
+    public UserPostCntResponseDto getUserPostCnt(Long userId) {
+        User user = userDao.findUserById(userId);
+
+        // 회원 검증
+        isRegisteredUser(userId, user);
+
+        // 게시글 개수 조회
+        UserPostCntResponseDto responseDto = userDao.getUserPostCnt(userId);
+        responseDto.setUserId(userId);
+
+        return responseDto;
+    }
+
     private User getUserByEmail(String email) {
         log.debug("이메일로 회원 조회: email={}", email);
 
@@ -172,5 +185,12 @@ public class UserServiceImpl implements UserService {
             throw EmailAlreadyExistException.of(email);
         }
         log.debug("이메일 중복 없음 확인 완료: email={}", email);
+    }
+
+    private static void isRegisteredUser(Long userId, User checkUser) {
+        if (checkUser == null) {
+            log.warn("회원 정보 수정 실패 - 존재하지 않음: userId={}", userId);
+            throw UserNotFoundException.ofUserId(userId);
+        }
     }
 }

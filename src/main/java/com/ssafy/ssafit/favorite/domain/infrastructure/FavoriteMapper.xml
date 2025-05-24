@@ -21,10 +21,11 @@
         WHERE user_id = #{userId} AND video_id = #{videoId};
     </delete>
 
-    <select id="getAllById" parameterType="long" resultType="Favorite">
-        SELECT *
-        FROM favorites
-        WHERE user_id = #{userId}
+    <select id="getAllById" parameterType="long" resultType="UserFavoriteResponseDto">
+        SELECT v.*
+        FROM videos v
+                 INNER JOIN favorites f ON v.id = f.video_id
+        WHERE f.user_id = #{userId};
     </select>
 
 

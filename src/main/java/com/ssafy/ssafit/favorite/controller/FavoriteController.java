@@ -1,6 +1,6 @@
 package com.ssafy.ssafit.favorite.controller;
 
-import com.ssafy.ssafit.favorite.dto.UserFavoriteDto;
+import com.ssafy.ssafit.favorite.dto.response.UserFavoriteResponseDto;
 import com.ssafy.ssafit.favorite.dto.response.FavoriteResponseDto;
 import com.ssafy.ssafit.favorite.service.FavoriteService;
 import com.ssafy.ssafit.global.auth.AuthenticatedUser;
@@ -16,13 +16,13 @@ import java.util.List;
 @Slf4j(topic = "FavoriteController")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/videos")
+@RequestMapping("/api/favorites")
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
 
     // 찜 등록, 제거
-    @PostMapping("/{videoId}/favorites")
+    @PostMapping("/{videoId}")
     public ResponseEntity<ApiResponse<FavoriteResponseDto>> addFavorite(@LoginUser AuthenticatedUser authenticatedUser,
                                                                         @PathVariable Long videoId) {
         log.info("회원ID={} addFavorite videoId={}", authenticatedUser.getUserId(), videoId);
@@ -31,9 +31,9 @@ public class FavoriteController {
     }
 
     // 찜 조회
-    @GetMapping("/favorites")
-    public ResponseEntity<ApiResponse<List<UserFavoriteDto>>> getFavorites(@LoginUser AuthenticatedUser authenticatedUser) {
-        List<UserFavoriteDto> list = favoriteService.getFavorites(authenticatedUser.getUserId());
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<UserFavoriteResponseDto>>> getFavorites(@LoginUser AuthenticatedUser authenticatedUser) {
+        List<UserFavoriteResponseDto> list = favoriteService.getFavorites(authenticatedUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("사용자 찜 목록 조회에 성공하였습니다.", list));
     }
 }

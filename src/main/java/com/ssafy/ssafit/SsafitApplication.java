@@ -7,11 +7,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan(
 		basePackages = {"com.ssafy.ssafit.user.domain.repository"
-		, "com.ssafy.ssafit.video.domain.repository"
-		, "com.ssafy.ssafit.favorite.domain.repository"
-		, "com.ssafy.ssafit.review.domain.repository"
-		, "com.ssafy.ssafit.comment.domain.repository"
-})
+				, "com.ssafy.ssafit.video.domain.repository"
+				, "com.ssafy.ssafit.favorite.domain.repository"
+				, "com.ssafy.ssafit.review.domain.repository"
+				, "com.ssafy.ssafit.comment.domain.repository"
+		})
 public class SsafitApplication {
 
 	public static void main(String[] args) {
