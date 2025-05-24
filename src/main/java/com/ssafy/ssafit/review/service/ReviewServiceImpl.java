@@ -83,7 +83,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 본인 작성 리뷰인지 확인
         if (!Objects.equals(review.getUserId(), userId)) {
             log.error("수정 권한 없음: userId={}는 reviewId={}의 수정 권한이 없습니다.", userId, reviewId);
-            throw ReviewAccessUnauthorized.of(reviewId);
+            throw ReviewAccessUnauthorizedException.of(reviewId);
         }
 
         // 객체 업데이트
