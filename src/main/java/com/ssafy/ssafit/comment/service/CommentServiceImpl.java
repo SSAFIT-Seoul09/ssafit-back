@@ -73,7 +73,7 @@ public class CommentServiceImpl implements CommentService {
         // 작성자와 수정하려는 사람이 같은지 확인.
         if(comment.getUserId() != userId) {
             log.error("수정 권한 없음: userId={}는 commentId={}의 수정 권한이 없습니다.", userId, commentId);
-            throw CommentAccessForbiddenException.of(commentId);
+            throw CommentAccessUnauthorizedException.of(commentId);
         }
 
         comment.update(requestDto);
@@ -101,7 +101,7 @@ public class CommentServiceImpl implements CommentService {
         // 본인 댓글인지 확인
         if(comment.getUserId() != userId) {
             log.error("삭제 권한 없음: userId={}는 commentId={}의 삭제 권한이 없습니다.", userId, commentId);
-            throw CommentAccessForbiddenException.of(commentId);
+            throw CommentAccessUnauthorizedException.of(commentId);
         }
 
         // 댓글 삭제 성공 여부
