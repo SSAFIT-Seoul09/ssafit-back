@@ -5,8 +5,8 @@ import com.ssafy.ssafit.user.domain.repository.UserDao;
 import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
-import com.ssafy.ssafit.video.dto.VideoRequestDto;
-import com.ssafy.ssafit.video.dto.VideoResponseDto;
+import com.ssafy.ssafit.video.dto.request.VideoRequestDto;
+import com.ssafy.ssafit.video.dto.response.VideoResponseDto;
 import com.ssafy.ssafit.video.exception.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -127,6 +127,17 @@ public class VideoServiceImpl implements VideoService {
             throw VideoDeleteException.of(videoId);
         }
         log.info("영상 삭제 완료: videoId={}", videoId);
+    }
+
+    @Override
+    public List<VideoResponseDto> getMyVideoList(Long userId) {
+        log.info("회원이 등록한 영상 조회 시작: userId={}", userId);
+
+        List<VideoResponseDto> list = videoDao.getVideoByUserId(userId);
+        log.info("조회된 영상의 개수 : {}", list.size());
+
+        log.info("회원이 등록한 영상 조회 완료");
+        return list;
     }
 
     private Video getVideo(Long videoId) {

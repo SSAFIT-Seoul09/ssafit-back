@@ -1,6 +1,7 @@
 package com.ssafy.ssafit.video.domain.repository;
 
 import com.ssafy.ssafit.video.domain.model.Video;
+import com.ssafy.ssafit.video.dto.response.VideoResponseDto;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface VideoDao {
 
     // 조회수 증가
     void increaseViewCnt(@Param("videoId") Long videoId);
+
+    List<VideoResponseDto> getVideoByUserId(@Param("userId") Long userId);
 }

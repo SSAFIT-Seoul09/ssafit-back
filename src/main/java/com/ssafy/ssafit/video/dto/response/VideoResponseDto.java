@@ -1,4 +1,4 @@
-package com.ssafy.ssafit.video.dto;
+package com.ssafy.ssafit.video.dto.response;
 
 import com.ssafy.ssafit.video.domain.model.Video;
 import lombok.*;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 public class VideoResponseDto {
 
-    private Long videoId;
+    private Long id;
     private String title;
     private String description;
     private String part;
@@ -23,7 +23,7 @@ public class VideoResponseDto {
 
     public static VideoResponseDto toDto(Video video) {
         return VideoResponseDto.builder()
-                .videoId(video.getId())
+                .id(video.getId())
                 .title(video.getTitle())
                 .description(video.getDescription())
                 .part(video.getPart().getValue())

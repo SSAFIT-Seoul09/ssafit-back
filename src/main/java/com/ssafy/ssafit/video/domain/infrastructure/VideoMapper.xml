@@ -73,4 +73,11 @@
         WHERE id = #{videoId}
     </update>
 
+    <!-- 회원의 영상 조회-->
+    <select id="getVideoByUserId" parameterType="long" resultType="VideoResponseDto">
+        SELECT *
+        FROM videos
+        WHERE user_id = #{userId}
+    </select>
+
 </mapper>

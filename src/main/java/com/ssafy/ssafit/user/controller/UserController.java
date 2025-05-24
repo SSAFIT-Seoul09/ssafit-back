@@ -11,12 +11,16 @@ import com.ssafy.ssafit.user.dto.response.UserPostCntResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignInResponseDto;
 import com.ssafy.ssafit.user.dto.response.UserSignUpResponseDto;
 import com.ssafy.ssafit.user.service.UserService;
+import com.ssafy.ssafit.video.dto.response.VideoResponseDto;
+import com.ssafy.ssafit.video.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j(topic = "UserController")
 @RestController
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final VideoService videoService;
 
     // 회원가입
     @PostMapping("/signup")
@@ -81,4 +86,18 @@ public class UserController {
         UserPostCntResponseDto responseDto = userService.getUserPostCnt(authenticatedUser.getUserId());
         return ResponseEntity.ok(ApiResponse.success("게시글 개수 조회 성공", responseDto));
     }
+
+    // 작성한 비디오 전체 조회
+    @GetMapping("/info/videos")
+    public ResponseEntity<ApiResponse<List<VideoResponseDto>>> getMyVideos(@LoginUser AuthenticatedUser authenticatedUser) {
+        log.info("회원 등록 영상 조회 - 회원ID: {}", authenticatedUser.getUserId());
+        List<VideoResponseDto> list = videoService.getMyVideoList(authenticatedUser.getUserId());
+        return ResponseEntity.ok(ApiResponse.success("회원이 등록한 영상 조회 성공", list));
+    }
+
+    // 작성한 리뷰 전체 조회
+
+    // 작성한 댓글 전체 조회
+
+
 }

@@ -1,4 +1,4 @@
-package com.ssafy.ssafit.video.dto;
+package com.ssafy.ssafit.video.dto.request;
 
 import lombok.Getter;
 

@@ -1,7 +1,7 @@
 package com.ssafy.ssafit.video.domain.model;
 
 import com.ssafy.ssafit.global.entity.TimeStamped;
-import com.ssafy.ssafit.video.dto.VideoRequestDto;
+import com.ssafy.ssafit.video.dto.request.VideoRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

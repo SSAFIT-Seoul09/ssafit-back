@@ -1,7 +1,7 @@
 package com.ssafy.ssafit.video.service;
 
-import com.ssafy.ssafit.video.dto.VideoRequestDto;
-import com.ssafy.ssafit.video.dto.VideoResponseDto;
+import com.ssafy.ssafit.video.dto.request.VideoRequestDto;
+import com.ssafy.ssafit.video.dto.response.VideoResponseDto;
 
 import java.util.List;
 
@@ -23,4 +23,6 @@ public interface VideoService {
     // 영상 삭제
     void deleteVideo(Long userId, Long videoId);
 
+    // 회원이 등록한 영상 목록 조회
+    List<VideoResponseDto> getMyVideoList(Long userId);
 }
