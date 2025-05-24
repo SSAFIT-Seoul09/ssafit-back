@@ -41,20 +41,20 @@ public class ReviewServiceImpl implements ReviewService {
             throw ReviewInsertException.of(userId);
         }
 
-        Review insertedReview = reviewDao.getReviewById(review.getId());
+        ReviewResponseDto reviewResponseDto = reviewDao.getReviewResponseDtoByReviewId(review.getId());
 
-        if (insertedReview == null) {
-            throw ReviewNotFoundException.of(insertedReview.getId());
+        if (reviewResponseDto == null) {
+            throw ReviewNotFoundException.of(reviewResponseDto.getId());
         }
-        log.info("리뷰 작성 성공: {}", insertedReview.getId());
-        return ReviewResponseDto.toDto(insertedReview);
+        log.info("리뷰 작성 성공: {}", reviewResponseDto.getId());
+        return reviewResponseDto;
     }
 
     @Override
     public List<ReviewResponseDto> getAllReviews() {
         log.info("모든 리뷰 조회 요청");
 
-        List<ReviewResponseDto> list = reviewDao.getAllReviews();
+        List<ReviewResponseDto> list = reviewDao.getAllReviewResponseDto();
         log.info("리뷰 목록 조회 결과: {}개", list.size());
 
         return list;
@@ -65,7 +65,7 @@ public class ReviewServiceImpl implements ReviewService {
     public List<ReviewResponseDto> getReview(Long videoId, Long reviewId) {
         log.info("특정 리뷰 조회 요청: videoId={}, reviewId={}", videoId, reviewId);
 
-        List<ReviewResponseDto> list = getReviews(videoId, reviewId);
+        List<ReviewResponseDto> list = getReviewsByCondition(videoId, reviewId);
 
         log.info("리뷰 조회 성공: videoId={}, reviewId={}, 찾은 개수 : {}", videoId, reviewId, list.size());
         return list;
@@ -92,14 +92,14 @@ public class ReviewServiceImpl implements ReviewService {
             throw ReviewUpdateException.of(reviewId);
         }
 
-        Review insertedReview = reviewDao.getReviewById(reviewId);
-        if (insertedReview == null) {
-            log.info("리뷰 수정 실패: reviewId={}", insertedReview.getId());
-            throw ReviewNotFoundException.of(insertedReview.getId());
+        ReviewResponseDto reponseDto = reviewDao.getReviewResponseDtoByReviewId(reviewId);
+        if (reponseDto == null) {
+            log.info("리뷰 수정 실패: reviewId={}", reponseDto.getId());
+            throw ReviewNotFoundException.of(reponseDto.getId());
         }
-        log.info("리뷰 수정 완료: reviewId={}", insertedReview.getId());
 
-        return ReviewResponseDto.toDto(insertedReview);
+        log.info("리뷰 수정 완료: reviewId={}", reponseDto.getId());
+        return reponseDto;
     }
 
     @Transactional
@@ -121,12 +121,12 @@ public class ReviewServiceImpl implements ReviewService {
         log.info("리뷰 삭제 완료: reviewId={}", reviewId);
     }
 
-    private List<ReviewResponseDto> getReviews(Long videoId, Long reviewId) {
+    private List<ReviewResponseDto> getReviewsByCondition(Long videoId, Long reviewId) {
         if (reviewId == null) {
-            return reviewDao.getReviewByVideoId(videoId);
+            return reviewDao.getReviewResponseDtoByVideoId(videoId);
         } else {
             reviewDao.increaseViewCnt(reviewId);
-            return reviewDao.getReviewByVideoIdAndReviewId(videoId, reviewId);
+            return reviewDao.getReviewResponseDtoByVideoIdAndReviewId(videoId, reviewId);
         }
     }
 
