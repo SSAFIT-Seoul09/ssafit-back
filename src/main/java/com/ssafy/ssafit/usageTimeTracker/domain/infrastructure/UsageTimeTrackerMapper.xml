@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.ssafit.usageTimeTracker.domain.repository.UsageTimeTrackerDao">
+
+    <select id="findByUserId" parameterType="long" resultType="UsageTimeTracker">
+        SELECT *
+        FROM usage_time_trackers
+        WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertTime" parameterType="UsageTimeTracker" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO usage_time_trackers (
+                                        user_id
+        ) VALUES (
+                  #{userId}
+                         )
+    </insert>
+
+    <update id="updateTime" parameterType="long">
+        UPDATE usage_time_trackers
+        SET total_time = total_time + #{runTime}
+    </update>
+
+
+</mapper>
