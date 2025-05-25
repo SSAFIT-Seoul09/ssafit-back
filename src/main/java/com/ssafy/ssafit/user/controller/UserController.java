@@ -19,6 +19,7 @@ import com.ssafy.ssafit.video.dto.response.VideoResponseDto;
 import com.ssafy.ssafit.video.service.VideoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +40,7 @@ public class UserController {
 
     // 회원가입
     @PostMapping("/signup")
-    public ResponseEntity<ApiResponse<UserSignUpResponseDto>> signup(@RequestBody UserSignUpRequestDto requestDto) {
+    public ResponseEntity<ApiResponse<UserSignUpResponseDto>> signup(@Valid @RequestBody UserSignUpRequestDto requestDto) {
         log.info("회원가입 요청: {}", requestDto.getEmail());
         UserSignUpResponseDto responseDto = userService.signup(requestDto);
         return ResponseEntity.ok(ApiResponse.success("회원가입에 성공하였습니다.", responseDto));
