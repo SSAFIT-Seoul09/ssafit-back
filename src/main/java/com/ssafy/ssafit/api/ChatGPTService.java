@@ -2,6 +2,7 @@ package com.ssafy.ssafit.api;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.ssafit.api.dto.KeywordCategoryResult;
 import com.ssafy.ssafit.api.dto.YoutubeMeta;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,11 +18,6 @@ import java.util.Map;
 @Slf4j(topic = "ChatGPTService")
 @Service
 public class ChatGPTService {
-
-    public record KeywordCategoryResult(
-            String category,
-            List<String> keywords
-    ) {}
 
     public KeywordCategoryResult getCategoryAndKeywords(YoutubeMeta meta, String openaiApiKey) throws Exception {
         WebClient webClient = WebClient.builder()

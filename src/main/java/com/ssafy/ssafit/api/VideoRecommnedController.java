@@ -1,5 +1,6 @@
 package com.ssafy.ssafit.api;
 
+import com.ssafy.ssafit.api.dto.KeywordCategoryResult;
 import com.ssafy.ssafit.api.dto.VideoRecommendationResult;
 import com.ssafy.ssafit.api.dto.YoutubeMeta;
 import com.ssafy.ssafit.api.dto.YoutubeVideo;
@@ -49,7 +50,7 @@ public class VideoRecommnedController {
         YoutubeMeta meta = youtubeService.fetchYoutubeMeta(videoId, youtubeApiKey);
 
         // 3. GPT로 카테고리 + 관련 키워드 추천
-        ChatGPTService.KeywordCategoryResult result = chatGPTService.getCategoryAndKeywords(meta, openaiApiKey);
+        KeywordCategoryResult result = chatGPTService.getCategoryAndKeywords(meta, openaiApiKey);
         String category = result.category();
         List<String> keywords = result.keywords();
 
