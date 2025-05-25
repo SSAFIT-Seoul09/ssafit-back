@@ -30,7 +30,7 @@ public class CommentController {
         return ResponseEntity.ok(ApiResponse.success("댓글 작성이 완료 되었습니다.", responseDto));
     }
 
-    // 댓글 조회
+    // 리뷰에 달린 댓글 조회
     @GetMapping("/{reviewId}")
     public ResponseEntity<ApiResponse<List<CommentResponseDto>>> getComments(@PathVariable(name = "reviewId") Long reviewId) {
         List<CommentResponseDto> list = commentService.getComments(reviewId);

@@ -16,4 +16,5 @@ public class CommentResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private String nickname;
+    private String reviewTitle;
 }

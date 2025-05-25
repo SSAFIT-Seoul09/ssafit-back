@@ -16,14 +16,16 @@
             ,#{content}
         )
     </insert>
-    
+
     <select id="getCommentResponseDtoByCommentId" parameterType="long" resultType="CommentResponseDto">
         SELECT
             c.*,
-            u.nickname
+            u.nickname,
+            r.title AS reviewTitle
         FROM
             comments c
-        JOIN users u ON c.user_id = u.id
+                JOIN users u ON c.user_id = u.id
+                JOIN reviews r ON c.review_id = r.id
         WHERE c.id = #{commentId}
     </select>
 
@@ -36,12 +38,15 @@
     <select id="getCommentResponseDtoByReviewId" parameterType="long" resultType="CommentResponseDto">
         SELECT
             c.*,
-            u.nickname
+            u.nickname,
+            r.title AS reviewTitle
         FROM
             comments c
                 JOIN users u ON c.user_id = u.id
+                JOIN reviews r ON c.review_id = r.id
         WHERE c.review_id = #{reviewId}
     </select>
+
 
     <update id="updateComment" parameterType="Comment">
         UPDATE comments
@@ -58,11 +63,14 @@
     <select id="getCommentResponseDtoByUserId" parameterType="long" resultType="CommentResponseDto">
         SELECT
             c.*,
-            u.nickname
+            u.nickname,
+            r.title AS reviewTitle
         FROM
             comments c
                 JOIN users u ON c.user_id = u.id
+                JOIN reviews r ON c.review_id = r.id
         WHERE c.user_id = #{userId}
     </select>
+
 
 </mapper>
