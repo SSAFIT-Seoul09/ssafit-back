@@ -22,7 +22,14 @@
     </delete>
 
     <select id="getAllById" parameterType="long" resultType="UserFavoriteResponseDto">
-        SELECT v.*
+        SELECT
+            f.id AS favoriteId,
+            v.id AS videoId,
+            v.title,
+            v.description,
+            v.part,
+            v.url,
+            v.views
         FROM videos v
                  INNER JOIN favorites f ON v.id = f.video_id
         WHERE f.user_id = #{userId};
