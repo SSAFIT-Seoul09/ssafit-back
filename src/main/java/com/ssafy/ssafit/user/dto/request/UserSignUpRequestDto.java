@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UserSignUpRequestDto(
+
         @NotBlank(message = "닉네임을 입력해주세요.")
         String nickname,
 
