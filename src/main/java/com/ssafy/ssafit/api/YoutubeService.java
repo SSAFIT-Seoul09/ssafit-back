@@ -17,18 +17,32 @@ import java.util.regex.Pattern;
 @Service
 public class YoutubeService {
 
+    // 예: https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ -> "dQw4w9WgXcQ"만 추출(v= 는 일반 주소, be=는 짧은 주소)
     public String extractVideoId(String url) {
-        // 예: https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ
-        String pattern = "(?:v=|be/)([a-zA-Z0-9_-]{11})";
+        String pattern = "(?:v=|be/)([a-zA-Z0-9_-]{11})";  // 뒤에 11자리 추출 정규식 표현
         Matcher matcher = Pattern.compile(pattern).matcher(url);
-        return matcher.find() ? matcher.group(1) : null;
+        return matcher.find() ? matcher.group(1) : null;  // 11자리를 찾았으면 group(1) or null
     }
 
     public YoutubeMeta fetchYoutubeMeta(String videoId, String apiKey) {
-        String url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
-        WebClient webClient = WebClient.create();
+//        String url = "https://www.googleapis.com/youtube/v3/videos?part=snippet&id=" + videoId + "&key=" + apiKey;
+//        WebClient webClient = WebClient.create();
+//        String response = webClient.get()
+//                .uri(url)
+//                .retrieve()
+//                .bodyToMono(String.class)
+//                .block();
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl("https://www.googleapis.com")
+                .build();
         String response = webClient.get()
-                .uri(url)  // 전체 URL 그대로!
+                .uri(uriBuilder -> uriBuilder
+                        .path("/youtube/v3/videos")
+                        .queryParam("part", "snippet")
+                        .queryParam("id", videoId)
+                        .queryParam("key", apiKey)
+                        .build())
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
@@ -79,7 +93,10 @@ public class YoutubeService {
             for (JsonNode item : items) {
                 videoIds.add(item.path("id").path("videoId").asText());
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            log.info("searchYoutubeByKeyword error : 1차 videoId 리스트 얻기에서 실패");
+            e.printStackTrace();
+        }
 
         if (videoIds.isEmpty()) return result;
 
@@ -102,7 +119,7 @@ public class YoutubeService {
             for (JsonNode item : items) {
                 String durationStr = item.path("contentDetails").path("duration").asText(); // ISO 8601
                 int seconds = parseYoutubeDuration(durationStr);
-                if (seconds >= 300) { // 5분 이상만
+                if (seconds >= 300) { // 5분 이상만. 쇼츠 불러오는거 막기 + 5분 이하의 운동은 운동답지 않을 가능성이 높기 때문
                     String videoId = item.path("id").asText();
                     JsonNode snippet = item.path("snippet");
                     result.add(new YoutubeVideo(
@@ -113,7 +130,10 @@ public class YoutubeService {
                     ));
                 }
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            log.info("searchYoutubeByKeyword error : 2차 videoId로 영상 길이 받아오기 실패");
+            e.printStackTrace();
+        }
 
         return result;
     }
