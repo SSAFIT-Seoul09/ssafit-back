@@ -1,12 +1,14 @@
 package com.ssafy.ssafit.video.dto.response;
 
 import com.ssafy.ssafit.video.domain.model.Video;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
