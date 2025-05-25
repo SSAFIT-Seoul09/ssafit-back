@@ -32,8 +32,8 @@ public class SwaggerConfig {
 
     private Info info() {
         return new Info()
-                .title("Final-PJT SSAFIT for 수인호정")
-                .description("SSAFIT API reference for developers")
+                .title("Final-PJT SSAFIT 수인호정")
+                .description("<h3>SSAFIT API reference for developers</h3>")
                 .version("1.0");
     }
 }

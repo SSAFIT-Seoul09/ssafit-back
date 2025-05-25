@@ -11,6 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 				, "com.ssafy.ssafit.favorite.domain.repository"
 				, "com.ssafy.ssafit.review.domain.repository"
 				, "com.ssafy.ssafit.comment.domain.repository"
+				, "com.ssafy.ssafit.usageTimeTracker.domain.repository"
 		})
 public class SsafitApplication {
 

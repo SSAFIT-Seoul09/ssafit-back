@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)   // 어노테이션의 생명주기. 런타임동안 어노테이션이 살아있다.
 public @interface LoginUser {
 
-    boolean required() default true;
+    boolean required() default true;  // GUEST 역할 부여시 사용
 }
 

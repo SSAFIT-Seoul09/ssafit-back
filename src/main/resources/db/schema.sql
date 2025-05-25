@@ -85,3 +85,16 @@ CREATE TABLE IF NOT EXISTS comments (
                                         CONSTRAINT fk_comments_review FOREIGN KEY (review_id) REFERENCES reviews(id)
                                             ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 6) 사용자 누적 이용 시간 추적 테이블
+CREATE TABLE IF NOT EXISTS usage_time_trackers (
+                                                  id         BIGINT NOT NULL AUTO_INCREMENT,
+                                                  user_id    BIGINT NOT NULL,
+                                                  total_time BIGINT NOT NULL DEFAULT 0,
+                                                  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                                  modified_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                                  PRIMARY KEY (id),
+                                                  UNIQUE KEY uq_usage_time_user (user_id),
+                                                  CONSTRAINT fk_usage_time_user FOREIGN KEY (user_id) REFERENCES users(id)
+                                                      ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
