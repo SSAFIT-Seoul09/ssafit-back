@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 @Service
 public class YoutubeService {
 
-
     public String extractVideoId(String url) {
         // 예: https://www.youtube.com/watch?v=dQw4w9WgXcQ or https://youtu.be/dQw4w9WgXcQ
         String pattern = "(?:v=|be/)([a-zA-Z0-9_-]{11})";
