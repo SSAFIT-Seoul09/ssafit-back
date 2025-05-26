@@ -76,7 +76,7 @@ public class YoutubeService {
                         .path("/youtube/v3/search")
                         .queryParam("part", "snippet")
                         .queryParam("q", keyword)
-                        .queryParam("maxResults", "5") // 5개만 예시로
+                        .queryParam("maxResults", "1") // 5개만 예시로
                         .queryParam("type", "video")
                         .queryParam("key", apiKey)
                         .build())
