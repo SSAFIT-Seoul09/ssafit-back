@@ -26,14 +26,6 @@ public class VideoRecommnedController {
     private final ChatGPTService chatGPTService;
     private final YoutubeService youtubeService;
 
-    // gpt 요청 테스트
-//    @GetMapping("/search")
-//    public String recommendVideoGPT(@RequestParam("body") String query) throws Exception {
-//        log.info("GPT 요청 시작 : 요청 들어온 query : {}", query);
-//        return chatGPTService.getYoutubeSummary(query);
-//    }
-
-
     // 1. 유튜브 api로 유저의 영상 메타데이터를 받아옴.
     // 2. 해당 메타데이터를 GPT API로 전송. gpt에게서 키워드 추천을 받음.
     // 3. 유튜브 API로 gpt 추천 키워드로 재검색. 해당 링크를 프론트에게 전달
