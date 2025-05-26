@@ -4,7 +4,10 @@ package com.ssafy.ssafit.user.domain.model;
 import com.ssafy.ssafit.global.entity.TimeStamped;
 import com.ssafy.ssafit.user.dto.request.UpdateUserDetailRequestDto;
 import com.ssafy.ssafit.user.dto.request.UserSignUpRequestDto;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
