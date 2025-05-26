@@ -34,6 +34,7 @@ public class WebConfig implements WebMvcConfigurer {
                 .addPathPatterns("/**")
                 .excludePathPatterns("/swagger-ui/**", "/v3/api-docs/**") // Swagger 경로 제외.
                 .excludePathPatterns("api/youtube/**") // 영상추천 경로 제외
+                .excludePathPatterns("/api/rank")  // 서버 사용자 상위 10명 엔드포인트
                 .excludePathPatterns("/css/**", "/js/**", "/images/**"); // 현재 로그인, 회원가입 요청을 제외하면 모든 요청에 jwt토큰 검증을 진행함.
     }
 

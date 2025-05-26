@@ -24,5 +24,16 @@
         SET total_time = total_time + #{runTime}
     </update>
 
+    <select id="getRankTopTen" resultType="RankResponseDto">
+        SELECT
+            utt.*,
+            u.nickname
+        FROM
+            usage_time_trackers utt
+                JOIN users u ON utt.user_id = u.id
+        ORDER BY utt.total_time DESC
+            LIMIT 10
+    </select>
+
 
 </mapper>

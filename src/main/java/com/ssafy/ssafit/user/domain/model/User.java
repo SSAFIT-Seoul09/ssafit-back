@@ -8,7 +8,6 @@ import lombok.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
