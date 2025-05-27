@@ -144,7 +144,7 @@ public class VideoServiceImpl implements VideoService {
         Video video = Optional.ofNullable(videoDao.findVideoById(videoId))
                 .orElseThrow(() -> {
                     log.error("영상 조회 실패: videoId={} (영상 없음)", videoId);
-                    throw VideoNotFoundException.of(videoId);
+                    return VideoNotFoundException.of(videoId);
                 });
         return video;
     }
@@ -154,7 +154,7 @@ public class VideoServiceImpl implements VideoService {
         User user = Optional.ofNullable(userDao.findUserById(userId))
                 .orElseThrow(() -> {
                     log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
-                    throw UserNotFoundException.ofUserId(userId);
+                    return UserNotFoundException.ofUserId(userId);
                 });
         return user != null;
     }

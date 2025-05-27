@@ -166,7 +166,7 @@ public class UserServiceImpl implements UserService {
         return Optional.ofNullable(userDao.findUserByEmail(email))
                 .orElseThrow(() -> {
                     log.warn("회원 조회 실패 - 존재하지 않는 이메일: {}", email);
-                    throw InvalidUserCredentialException.ofEmail(email);
+                    return InvalidUserCredentialException.ofEmail(email);
                 });
     }
 

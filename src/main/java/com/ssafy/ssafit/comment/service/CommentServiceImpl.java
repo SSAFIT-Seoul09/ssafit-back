@@ -121,7 +121,7 @@ public class CommentServiceImpl implements CommentService {
         User user = Optional.ofNullable(userDao.findUserById(userId))
                 .orElseThrow(() -> {
                     log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
-                    throw UserNotFoundException.ofUserId(userId);
+                    return UserNotFoundException.ofUserId(userId);
                 });
         return user != null;
     }
