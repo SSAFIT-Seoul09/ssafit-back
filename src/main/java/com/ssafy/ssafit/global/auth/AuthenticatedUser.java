@@ -1,5 +1,6 @@
 package com.ssafy.ssafit.global.auth;
 
+import com.ssafy.ssafit.user.domain.model.User;
 import com.ssafy.ssafit.user.domain.model.UserRole;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
@@ -23,6 +24,13 @@ public class AuthenticatedUser {
         return AuthenticatedUser.builder()
                 .userId(Long.parseLong(claims.getSubject()))
                 .role(UserRole.valueOf((String) claims.get("auth")))
+                .build();
+    }
+
+    public static AuthenticatedUser of(User user) {
+        return AuthenticatedUser.builder()
+                .userId(user.getId())
+                .role(user.getRole())
                 .build();
     }
 

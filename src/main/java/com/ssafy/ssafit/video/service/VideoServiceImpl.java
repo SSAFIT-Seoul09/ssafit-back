@@ -1,5 +1,6 @@
 package com.ssafy.ssafit.video.service;
 
+import com.ssafy.ssafit.global.util.JwtUtil;
 import com.ssafy.ssafit.user.domain.model.User;
 import com.ssafy.ssafit.user.domain.repository.UserDao;
 import com.ssafy.ssafit.user.exception.UserNotFoundException;
@@ -25,15 +26,13 @@ public class VideoServiceImpl implements VideoService {
 
     private final VideoDao videoDao;
     private final UserDao userDao;
+    private final JwtUtil jwtUtil;
 
     // 영상 등록
     @Transactional
     @Override
     public VideoResponseDto insertVideo(Long userId, VideoRequestDto requestDto) {
         log.info("영상 등록 시작: userId={}, videoRequestDto={}", userId, requestDto);
-
-        // 해당 회원의 존재 여부
-        isUserValid(userId);
 
         Video video = Video.from(userId, requestDto);
         int inserted = videoDao.insertVideo(video);
@@ -86,8 +85,6 @@ public class VideoServiceImpl implements VideoService {
     public VideoResponseDto updateVideo(Long userId, Long videoId, VideoRequestDto requestDto) {
         log.info("영상 수정 시작: videoId={}, userId={}, requestDto={}", videoId, userId, requestDto);
 
-        isUserValid(userId);
-
         Video video = getVideo(videoId);
 
         isWrittenByUserId(userId, videoId, video);
@@ -114,8 +111,6 @@ public class VideoServiceImpl implements VideoService {
     @Override
     public void deleteVideo(Long userId, Long videoId) {
         log.info("영상 삭제 시작: videoId={}, userId={}", videoId, userId);
-
-        isUserValid(userId);
 
         Video video = getVideo(videoId);
 
@@ -147,16 +142,6 @@ public class VideoServiceImpl implements VideoService {
                     return VideoNotFoundException.of(videoId);
                 });
         return video;
-    }
-
-    // 존재하는 회원의 요청인지 확인
-    private boolean isUserValid(Long userId) {
-        User user = Optional.ofNullable(userDao.findUserById(userId))
-                .orElseThrow(() -> {
-                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
-                    return UserNotFoundException.ofUserId(userId);
-                });
-        return user != null;
     }
 
     // 요청자가 작성한 글인지 확인

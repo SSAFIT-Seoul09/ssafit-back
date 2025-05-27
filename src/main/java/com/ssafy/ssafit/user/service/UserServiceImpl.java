@@ -96,10 +96,6 @@ public class UserServiceImpl implements UserService {
     public UserDetailResponseDTO getUserInfo(Long userId) {
         log.info("회원 정보 조회 요청: userId={}", userId);
         User user = userDao.findUserById(userId);
-        if(user == null) {
-            log.warn("회원 정보 조회 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.ofUserId(userId);
-        }
 
         log.debug("회원 정보 조회 성공: userId={}", userId);
         return UserDetailResponseDTO.toDto(user);
@@ -110,10 +106,6 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDetailResponseDTO updateUser(Long userId, UpdateUserDetailRequestDto requestDto) {
         log.info("회원 정보 수정 요청: userId={}", userId);
-
-        // 등록된 회원인지 확인
-        User checkUser = userDao.findUserById(userId);
-        isRegisteredUser(userId, checkUser);
 
         User user = User.from(userId, requestDto);
         if (user.getPassword() != null) {
@@ -150,9 +142,6 @@ public class UserServiceImpl implements UserService {
     public UserPostCntResponseDto getUserPostCnt(Long userId) {
         User user = userDao.findUserById(userId);
 
-        // 회원 검증
-        isRegisteredUser(userId, user);
-
         // 게시글 개수 조회
         UserPostCntResponseDto responseDto = userDao.getUserPostCnt(userId);
         responseDto.setUserId(userId);
@@ -185,12 +174,5 @@ public class UserServiceImpl implements UserService {
             throw EmailAlreadyExistException.of(email);
         }
         log.debug("이메일 중복 없음 확인 완료: email={}", email);
-    }
-
-    private static void isRegisteredUser(Long userId, User checkUser) {
-        if (checkUser == null) {
-            log.warn("회원 정보 수정 실패 - 존재하지 않음: userId={}", userId);
-            throw UserNotFoundException.ofUserId(userId);
-        }
     }
 }

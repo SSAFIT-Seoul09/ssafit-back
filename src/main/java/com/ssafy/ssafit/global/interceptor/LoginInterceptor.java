@@ -5,6 +5,9 @@ import com.ssafy.ssafit.global.auth.UserContext;
 import com.ssafy.ssafit.global.exception.ErrorCode;
 import com.ssafy.ssafit.global.util.JwtUtil;
 import com.ssafy.ssafit.global.util.exception.TokenException;
+import com.ssafy.ssafit.user.domain.model.User;
+import com.ssafy.ssafit.user.domain.repository.UserDao;
+import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,12 +17,15 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.Optional;
+
 @Slf4j(topic = "LoginInterceptor - JWT 토큰 로그인 검증")
 @RequiredArgsConstructor
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
 
     private final JwtUtil jwtUtil;
+    private final UserDao userDao;
     private static final AntPathMatcher antPathMatcher = new AntPathMatcher();
 
     @Override
@@ -79,10 +85,19 @@ public class LoginInterceptor implements HandlerInterceptor {
         // 4. 사용자 정보 추출
         Claims claims = jwtUtil.getUserInfoFromToken(token);
 
-        // 5. AuthenticatedUser 객체에 JWT토큰의 사용자 정보 저장
-        AuthenticatedUser authenticatedUser = AuthenticatedUser.of(claims);
+        // 5. 사용자 유효성 검사
+        log.info("사용자 유효성 검사");
+        Long userId = Long.parseLong(claims.getSubject());
+        User user = Optional.ofNullable(userDao.findUserById(userId))
+                .orElseThrow(() -> {
+                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
+                    return UserNotFoundException.ofUserId(userId);
+                });
 
-        // 6. ThreadLocal 저장
+        // 6. AuthenticatedUser 객체에 JWT토큰의 사용자 정보 저장
+        AuthenticatedUser authenticatedUser = AuthenticatedUser.of(user);
+
+        // 7. ThreadLocal 저장
         UserContext.setUser(authenticatedUser);
 
         log.info("JWT 인증 성공: userId={}, role={}", authenticatedUser.getUserId(), authenticatedUser.getRole());
