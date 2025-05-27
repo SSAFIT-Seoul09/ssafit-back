@@ -1,9 +1,5 @@
 package com.ssafy.ssafit.video.service;
 
-import com.ssafy.ssafit.global.util.JwtUtil;
-import com.ssafy.ssafit.user.domain.model.User;
-import com.ssafy.ssafit.user.domain.repository.UserDao;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import com.ssafy.ssafit.video.domain.model.Video;
 import com.ssafy.ssafit.video.domain.repository.VideoDao;
 import com.ssafy.ssafit.video.dto.request.VideoRequestDto;
@@ -25,8 +21,6 @@ import java.util.Optional;
 public class VideoServiceImpl implements VideoService {
 
     private final VideoDao videoDao;
-    private final UserDao userDao;
-    private final JwtUtil jwtUtil;
 
     // 영상 등록
     @Transactional

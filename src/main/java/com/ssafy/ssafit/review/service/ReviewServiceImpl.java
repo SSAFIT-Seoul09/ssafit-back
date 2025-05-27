@@ -5,9 +5,6 @@ import com.ssafy.ssafit.review.domain.repository.ReviewDao;
 import com.ssafy.ssafit.review.dto.request.ReviewRequestDto;
 import com.ssafy.ssafit.review.dto.response.ReviewResponseDto;
 import com.ssafy.ssafit.review.exception.*;
-import com.ssafy.ssafit.user.domain.model.User;
-import com.ssafy.ssafit.user.domain.repository.UserDao;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j(topic = "ReviewServiceImpl")
 @Service
@@ -24,14 +20,11 @@ import java.util.Optional;
 public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewDao reviewDao;
-    private final UserDao userDao;
 
     @Transactional
     @Override
     public ReviewResponseDto createReview(Long userId, Long videoId, ReviewRequestDto requestDto) {
         log.info("리뷰 작성 요청 : {} {} {}",userId, videoId, requestDto);
-
-        isUserValid(userId);
 
         Review review = Review.of(userId, videoId, requestDto);
 
@@ -44,7 +37,7 @@ public class ReviewServiceImpl implements ReviewService {
         ReviewResponseDto reviewResponseDto = reviewDao.getReviewResponseDtoByReviewId(review.getId());
 
         if (reviewResponseDto == null) {
-            throw ReviewNotFoundException.of(reviewResponseDto.getId());
+            throw ReviewNotFoundException.of(review.getId());
         }
         log.info("리뷰 작성 성공: {}", reviewResponseDto.getId());
         return reviewResponseDto;
@@ -76,8 +69,6 @@ public class ReviewServiceImpl implements ReviewService {
     public ReviewResponseDto updateReview(Long userId, Long reviewId, ReviewRequestDto requestDto) {
         log.info("리뷰 수정 요청: userId={}, reviewId={}, requestDto={}", userId, reviewId, requestDto);
 
-        isUserValid(userId);
-
         Review review = getReview(reviewId);
 
         isWrittenByUserId(userId, reviewId, review);
@@ -94,8 +85,8 @@ public class ReviewServiceImpl implements ReviewService {
 
         ReviewResponseDto reponseDto = reviewDao.getReviewResponseDtoByReviewId(reviewId);
         if (reponseDto == null) {
-            log.info("리뷰 수정 실패: reviewId={}", reponseDto.getId());
-            throw ReviewNotFoundException.of(reponseDto.getId());
+            log.info("리뷰 수정 실패: reviewId={}", reviewId);
+            throw ReviewNotFoundException.of(reviewId);
         }
 
         log.info("리뷰 수정 완료: reviewId={}", reponseDto.getId());
@@ -106,8 +97,6 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public void deleteReview(Long userId, Long reviewId) {
         log.info("리뷰 삭제 요청: userId={}, reviewId={}", userId, reviewId);
-
-        isUserValid(userId);
 
         Review review = getReview(reviewId);
 
@@ -145,16 +134,6 @@ public class ReviewServiceImpl implements ReviewService {
             throw ReviewNotFoundException.of(reviewId);
         }
         return review;
-    }
-
-    // 존재하는 회원의 요청인지 확인
-    private boolean isUserValid(Long userId) {
-        User user = Optional.ofNullable(userDao.findUserById(userId))
-                .orElseThrow(() -> {
-                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
-                    return UserNotFoundException.ofUserId(userId);
-                });
-        return user != null;
     }
 
     // 요청자가 작성한 글인지 확인

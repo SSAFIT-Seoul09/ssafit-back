@@ -5,9 +5,6 @@ import com.ssafy.ssafit.comment.domain.repository.CommentDao;
 import com.ssafy.ssafit.comment.dto.request.CommentRequestDto;
 import com.ssafy.ssafit.comment.dto.response.CommentResponseDto;
 import com.ssafy.ssafit.comment.exception.*;
-import com.ssafy.ssafit.user.domain.model.User;
-import com.ssafy.ssafit.user.domain.repository.UserDao;
-import com.ssafy.ssafit.user.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -15,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j(topic = "CommentServiceImpl")
 @Service
@@ -24,14 +20,11 @@ import java.util.Optional;
 public class CommentServiceImpl implements CommentService {
 
     private final CommentDao commentDao;
-    private final UserDao userDao;
 
     @Transactional
     @Override
     public CommentResponseDto createComment(Long userId, Long reviewId, CommentRequestDto requestDto) {
         log.info("댓글 작성 요청: userId={}, reviewId={}, requestDto={}", userId, reviewId, requestDto);
-
-        isUserValid(userId);
 
         Comment comment = Comment.of(userId, reviewId, requestDto);
 
@@ -45,7 +38,7 @@ public class CommentServiceImpl implements CommentService {
 
         CommentResponseDto responseDto = commentDao.getCommentResponseDtoByCommentId(comment.getId());
         if (responseDto == null) {
-            log.error("댓글 삽입 실패: commentId={}", responseDto.getId());
+            log.error("댓글 삽입 실패");
             throw CommentNotFoundException.of();
         }
 
@@ -66,8 +59,6 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentResponseDto update(Long userId, Long commentId, CommentRequestDto requestDto) {
         log.info("댓글 수정 요청: userId={}, commentId={}, requestDto={}", userId, commentId, requestDto);
-
-        isUserValid(userId);
 
         Comment comment = commentDao.findById(commentId);
 
@@ -93,8 +84,6 @@ public class CommentServiceImpl implements CommentService {
     public void deleteComment(Long userId, Long commentId) {
         log.info("댓글 삭제 요청: userId={}, commentId={}", userId, commentId);
 
-        isUserValid(userId);
-
         Comment comment = commentDao.findById(commentId);
 
         isWrittenByUserId(userId, commentId, comment);
@@ -113,17 +102,6 @@ public class CommentServiceImpl implements CommentService {
         List<CommentResponseDto> list = commentDao.getCommentResponseDtoByUserId(userId);
         log.info("회원이 작성한 댓글 개수 : {}", list.size());
         return list;
-    }
-
-
-    // 존재하는 회원의 요청인지 확인
-    private boolean isUserValid(Long userId) {
-        User user = Optional.ofNullable(userDao.findUserById(userId))
-                .orElseThrow(() -> {
-                    log.error("해당 userId : {}는 존재하지 않는 회원입니다.", userId);
-                    return UserNotFoundException.ofUserId(userId);
-                });
-        return user != null;
     }
 
     // 요청자가 작성한 글인지 확인
