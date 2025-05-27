@@ -57,7 +57,7 @@ public class UsageTimeTrackerAOP {
                     usageTimeTrackerDao.insertTime(usageTimeTracker);
                 } else {
 //                    usageTimeTracker.addRunTime(runTime);
-                    usageTimeTrackerDao.updateTime(runTime);
+                    usageTimeTrackerDao.updateTime(user.getId(), runTime);
                 }
 
                 log.info("이번 요청 runTime : {} ms", runTime);

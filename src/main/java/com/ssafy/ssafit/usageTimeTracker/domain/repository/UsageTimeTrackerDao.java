@@ -9,7 +9,7 @@ import java.util.List;
 public interface UsageTimeTrackerDao {
     UsageTimeTracker findByUserId(@Param("userId") long userId);
 
-    void updateTime(@Param("runTime") long runTime);
+    void updateTime(@Param("userId") Long userId, @Param("runTime") long runTime);
 
     void insertTime(UsageTimeTracker usageTimeTracker);
 

@@ -19,9 +19,10 @@
                          )
     </insert>
 
-    <update id="updateTime" parameterType="long">
+    <update id="updateTime">
         UPDATE usage_time_trackers
         SET total_time = total_time + #{runTime}
+        WHERE user_id = #{userId}
     </update>
 
     <select id="getRankTopTen" resultType="RankResponseDto">
